@@ -2,6 +2,10 @@
 
 <form action="/save/{{.Title}}" method = "POST">
     <div>
+        <label for ="name">名前</label>
+        <input type="text" name = "name">
+    </div>
+    <div>
         <textarea name="body" rows="20" cols="80">{{printf "%s" .Body}}</textarea>
     </div>
     <div>

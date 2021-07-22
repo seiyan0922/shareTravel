@@ -12,6 +12,7 @@ func main() {
 	http.HandleFunc("/view/", controller.MakeHandler(controller.ViewHandler))
 	http.HandleFunc("/edit/", controller.MakeHandler(controller.EditHandler))
 	http.HandleFunc("/save/", controller.MakeHandler(controller.SaveHandler))
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/create/", controller.MakeHandler(controller.CrateUserHandler))
 
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
