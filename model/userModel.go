@@ -1,7 +1,5 @@
 package model
 
-import "fmt"
-
 type User struct {
 	Id      int
 	Name    string
@@ -18,8 +16,6 @@ func (user *User) CreateUser() error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("IDは%dです", user.Id)
 
 	defer stmt.Close()
 	stmt.Exec(user.Name, user.Age, user.Address)

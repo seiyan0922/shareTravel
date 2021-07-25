@@ -1,20 +1,14 @@
 package controller
 
 import (
-	"io/ioutil"
+	"fmt"
 	"net/http"
 	"regexp"
 	"text/template"
 )
 
-//レスポンスで返すページの構造体定義
-type Page struct {
-	Title string
-	Body  []byte
-}
-
 //テンプレートのキャッシュの作成
-var templates = template.Must(template.ParseFiles("view/edit.html", "view/view.html"))
+var templates = template.Must(template.ParseFiles("view/edit.html", "view/view.html", "view/user/create.html"))
 
 //入力値保存関数（代替的にtxtファイルに保存）
 /* func (p *Page) Save() error {
@@ -23,22 +17,23 @@ var templates = template.Must(template.ParseFiles("view/edit.html", "view/view.h
 } */
 
 //データの読み込み（大体的にテキストファイルの読み込み）
-func LoadPage(title string) (*Page, error) {
-	filename := title + ".txt"
-	body, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	return &Page{Title: title, Body: body}, nil
-}
+// func LoadPage(title string) (*Page, error) {
+// 	filename := title + ".txt"
+// 	body, err := ioutil.ReadFile(filename)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &Page{Title: title, Body: body}, nil
+// }
 
 //テンプレートファイルの読み込み関数
-func RenderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 	/* t, _ := template.ParseFiles(tmpl + ".html")
 	t.Execute(w, p) */
 
-	err := templates.ExecuteTemplate(w, tmpl+".html", p)
+	err := templates.ExecuteTemplate(w, tmpl+".html", i)
 	if err != nil {
+		fmt.Println("error:not found")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -52,6 +47,7 @@ func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
+			fmt.Println("error:No Path")
 			http.NotFound(w, r)
 			return
 		}
