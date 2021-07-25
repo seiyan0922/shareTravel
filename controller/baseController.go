@@ -8,23 +8,11 @@ import (
 )
 
 //テンプレートのキャッシュの作成
-var templates = template.Must(template.ParseFiles("view/edit.html", "view/view.html", "view/user/create.html"))
-
-//入力値保存関数（代替的にtxtファイルに保存）
-/* func (p *Page) Save() error {
-	filename := p.Title + ".txt"
-	return ioutil.WriteFile("../"+filename, p.Body, 0600)
-} */
-
-//データの読み込み（大体的にテキストファイルの読み込み）
-// func LoadPage(title string) (*Page, error) {
-// 	filename := title + ".txt"
-// 	body, err := ioutil.ReadFile(filename)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &Page{Title: title, Body: body}, nil
-// }
+var templates = template.Must(template.ParseFiles(
+	"view/edit.html",
+	"view/view.html",
+	"view/user/create.html",
+	"view/user/complete.html"))
 
 //テンプレートファイルの読み込み関数
 func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
@@ -54,3 +42,19 @@ func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 		fn(w, r, m[2])
 	}
 }
+
+//入力値保存関数（代替的にtxtファイルに保存）
+/* func (p *Page) Save() error {
+	filename := p.Title + ".txt"
+	return ioutil.WriteFile("../"+filename, p.Body, 0600)
+} */
+
+//データの読み込み（大体的にテキストファイルの読み込み）
+// func LoadPage(title string) (*Page, error) {
+// 	filename := title + ".txt"
+// 	body, err := ioutil.ReadFile(filename)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return &Page{Title: title, Body: body}, nil
+// }

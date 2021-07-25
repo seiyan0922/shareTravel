@@ -3,11 +3,12 @@ package controller
 import "net/http"
 
 func SaveHandler(w http.ResponseWriter, r *http.Request, title string) {
-	// body := r.FormValue("body")
+	/* body := r.FormValue("body")
+	p := &Page{Title: title, Body: []byte(body)}
 
-	// err := p.Save()
+	err := p.Save()
 
-	/* 	if err != nil {
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	} */
