@@ -17,10 +17,10 @@ type Page struct {
 var templates = template.Must(template.ParseFiles("view/edit.html", "view/view.html"))
 
 //入力値保存関数（代替的にtxtファイルに保存）
-func (p *Page) Save() error {
+/* func (p *Page) Save() error {
 	filename := p.Title + ".txt"
 	return ioutil.WriteFile("../"+filename, p.Body, 0600)
-}
+} */
 
 //データの読み込み（大体的にテキストファイルの読み込み）
 func LoadPage(title string) (*Page, error) {
