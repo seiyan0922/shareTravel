@@ -9,18 +9,19 @@ import (
 
 //テンプレートのキャッシュの作成
 var templates = template.Must(template.ParseFiles(
-	"view/edit.html",
-	"view/view.html",
-	"view/user/create.html",
-	"view/user/complete.html",
-	"view/user/index.html"))
+	"view/top/top.gtpl",
+	"view/edit.gtpl",
+	"view/view.gtpl",
+	"view/user/create.gtpl",
+	"view/user/complete.gtpl",
+	"view/user/index.gtpl"))
 
 //テンプレートファイルの読み込み関数
 func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 	/* t, _ := template.ParseFiles(tmpl + ".html")
 	t.Execute(w, p) */
 
-	err := templates.ExecuteTemplate(w, tmpl+".html", i)
+	err := templates.ExecuteTemplate(w, tmpl+".gtpl", i)
 	if err != nil {
 		fmt.Println("error:not found")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -29,7 +30,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 }
 
 //
-var validPath = regexp.MustCompile("^/(edit|save|view|create|index)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(top|edit|save|view|create|index)/([a-zA-Z0-9]+)$")
 
 //
 func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
