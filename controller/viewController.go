@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func ViewHandler(w http.ResponseWriter, r *http.Request, title string) {
+func ViewHandler(w http.ResponseWriter, r *http.Request) {
 	// p, err := LoadPage(title)
 
 	// user := model.User{Name: "Test", Age: 20, Address: 1999999}
