@@ -14,13 +14,17 @@ var templates = template.Must(template.ParseFiles(
 	"view/view.gtpl",
 	"view/user/create.gtpl",
 	"view/user/complete.gtpl",
-	"view/user/index.gtpl"))
+	"view/user/index.gtpl",
+	"view/common/_footer.gtpl",
+	"view/common/_header.gtpl"))
 
 //テンプレートファイルの読み込み関数
 func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 	/* t, _ := template.ParseFiles(tmpl + ".html")
 	t.Execute(w, p) */
 
+	templates.ExecuteTemplate(w, "_header.gtpl", i)
+	templates.ExecuteTemplate(w, "_footer.gtpl", i)
 	err := templates.ExecuteTemplate(w, tmpl+".gtpl", i)
 	if err != nil {
 		fmt.Println("error:not found")
