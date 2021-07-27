@@ -12,7 +12,8 @@ var templates = template.Must(template.ParseFiles(
 	"view/edit.html",
 	"view/view.html",
 	"view/user/create.html",
-	"view/user/complete.html"))
+	"view/user/complete.html",
+	"view/user/index.html"))
 
 //テンプレートファイルの読み込み関数
 func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
@@ -28,7 +29,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 }
 
 //
-var validPath = regexp.MustCompile("^/(edit|save|view|create)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(edit|save|view|create|index)/([a-zA-Z0-9]+)$")
 
 //
 func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {

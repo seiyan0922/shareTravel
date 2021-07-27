@@ -41,3 +41,10 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request, title string) {
 	}
 
 }
+
+func IndexUserHandler(w http.ResponseWriter, r *http.Request, title string) {
+	users := model.IndexUser()
+
+	RenderTemplate(w, "index", users)
+
+}
