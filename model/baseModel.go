@@ -11,7 +11,7 @@ var Db *sql.DB
 //DBへの接続
 func OpenSQL() {
 	var err error
-	Db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/test?parseTime=true")
+	Db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/share_travel?parseTime=true")
 	if err != nil {
 		panic(err)
 	}
