@@ -1,3 +1,42 @@
+body{
+    margin:0;
+    padding:0;
+}
+
+/* ヘッダー設定 */
+.common-header{
+    height:50px;
+    width:100%;
+    background-color: #222222;
+}
+
+
 .header-title{
-    color:brown;
+    font-family: HiraMinProN-W6;
+    color:cornsilk;
+    padding: 10px 0 0 20px ;
+}
+
+/* body共通設定 */
+.body{
+    padding:0 200px;
+    text-align:center;
+}
+
+
+/* フッター設定 */
+.common-footer{
+    height:50px;
+    width:100%;
+    background-color: #222222;
+    text-align:right;
+    position: absolute;
+    bottom:0;
+}
+
+.made-by{
+    margin:20px 10px 0 0;
+    font-size:12px;
+    font-family: HiraMinProN-W6;
+    color:cornsilk;
 }

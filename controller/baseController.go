@@ -34,18 +34,18 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 }
 
 //
-var validPath = regexp.MustCompile("^/(top|edit|save|view|create|index)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(top|event)/([a-zA-Z0-9/]+)$")
 
 //
 func MakeHandler(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
-		fmt.Println(r.URL.Path)
 		if m == nil {
 			fmt.Println("error:No Path")
 			http.NotFound(w, r)
 			return
 		}
+		fmt.Println(m)
 		fn(w, r)
 	}
 }
