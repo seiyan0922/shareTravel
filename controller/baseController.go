@@ -4,28 +4,32 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 	"text/template"
 )
 
 //テンプレートのキャッシュの作成
-var templates = template.Must(template.ParseFiles(
-	"view/top/top.gtpl",
-	"view/edit.gtpl",
-	"view/view.gtpl",
-	"view/user/create.gtpl",
-	"view/user/complete.gtpl",
-	"view/user/index.gtpl",
-	"view/common/_footer.gtpl",
-	"view/common/_header.gtpl"))
-
+/* var templates = template.Must(template.ParseFiles(
+"view/top/top.gtpl",
+"view/edit.gtpl",
+"view/view.gtpl",
+"view/event/create.gtpl",
+"view/user/create.gtpl",
+"view/user/complete.gtpl",
+"view/user/index.gtpl",
+"view/common/_footer.gtpl",
+"view/common/_header.gtpl"))
+*/
 //テンプレートファイルの読み込み関数
 func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 	/* t, _ := template.ParseFiles(tmpl + ".html")
 	t.Execute(w, p) */
-
-	templates.ExecuteTemplate(w, "_header.gtpl", i)
-	templates.ExecuteTemplate(w, "_footer.gtpl", i)
-	err := templates.ExecuteTemplate(w, tmpl+".gtpl", i)
+	templates := template.Must(template.ParseFiles(tmpl+".gtpl", "view/common/_footer.gtpl", "view/common/_header.gtpl"))
+	arr := strings.Split(tmpl, "/")
+	file := arr[len(arr)-1]
+	templates.ExecuteTemplate(w, "_header.gtpl", nil)
+	templates.ExecuteTemplate(w, "_footer.gtpl", nil)
+	err := templates.ExecuteTemplate(w, file+".gtpl", i)
 	if err != nil {
 		fmt.Println("error:not found")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -37,16 +41,11 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 var validPath = regexp.MustCompile("^/(top|event)/([a-zA-Z0-9/]+)$")
 
 //
-func MakeHandler(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
+func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
-		if m == nil {
-			fmt.Println("error:No Path")
-			http.NotFound(w, r)
-			return
-		}
 		fmt.Println(m)
-		fn(w, r)
+		fn(w, r, m[2])
 	}
 }
 

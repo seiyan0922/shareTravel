@@ -2,7 +2,7 @@ package controller
 
 import "net/http"
 
-func EditHandler(w http.ResponseWriter, r *http.Request) {
+func EditHandler(w http.ResponseWriter, r *http.Request, path string) {
 	// p, err := LoadPage(title)
 
 	// if err != nil {

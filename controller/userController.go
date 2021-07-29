@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+func CreateUserHandler(w http.ResponseWriter, r *http.Request, path string) {
 
 	//HTTPメソッドを取得
 	method := r.Method
@@ -36,15 +36,15 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		user.CreateUser()
 		// RenderTemplate(w, "complete", user)
-		RenderTemplate(w, "complete", user)
+		RenderTemplate(w, "view/user/complete", user)
 
 	}
 
 }
 
-func IndexUserHandler(w http.ResponseWriter, r *http.Request) {
+func IndexUserHandler(w http.ResponseWriter, r *http.Request, path string) {
 	users := model.IndexUser()
 
-	RenderTemplate(w, "index", users)
+	RenderTemplate(w, "view/user/index", users)
 
 }
