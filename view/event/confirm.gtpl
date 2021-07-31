@@ -6,7 +6,12 @@
             <div>イベント名：{{.Name}}</div>
             <div>日付：{{.Date}}</div>
         </div>
-        <div>OK</div>
+        <form action="/event/save" method="POST">
+            <input type="hidden" value={{.Date}} name="date">
+            <input type="hidden" value={{.Name}} name="name">
+            <input type="submit" value="OK">
+            
+        </form>
     </div>
 </div>
 
