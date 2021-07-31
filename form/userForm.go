@@ -6,9 +6,3 @@ type User struct {
 	Age     int
 	Address string
 }
-
-type Event struct {
-	Id   int
-	Name string
-	Date string
-}

@@ -17,6 +17,8 @@ func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
 		confirmEventHandler(w, r)
 	case "save":
 		saveEventHandler(w, r)
+	case "show":
+		showEventHandler(w, r)
 
 	}
 }
@@ -30,6 +32,14 @@ func confirmEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	event.Name = r.FormValue("name")
 	event.Date = r.FormValue("datetime")
+	// //セッション開始
+	// manager := sessions.NewManager()
+	// sessions.StartDefaultSession(manager)
+	// //セッション変数の設定※ここでエラー
+	// session, _ := manager.Get(r, sessions.DefaultCookieName)
+	// session.Set("event", event)
+	// //セッションの保存
+	// session.Save()
 
 	RenderTemplate(w, "view/event/confirm", event)
 
@@ -41,7 +51,12 @@ func saveEventHandler(w http.ResponseWriter, r *http.Request) {
 	event.Name = r.FormValue("name")
 	event.Date = r.FormValue("date")
 	fmt.Println(r.FormValue("name"))
-	event.CreateEvent()
+	key := event.CreateEvent()
+	event.AuthKey = key
 	RenderTemplate(w, "view/event/complete", event)
+
+}
+
+func showEventHandler(w http.ResponseWriter, r *http.Request) {
 
 }

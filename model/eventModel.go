@@ -2,29 +2,42 @@ package model
 
 import (
 	"fmt"
+	"math/rand"
 	"shareTravel/form"
 	"time"
 )
 
 type Event form.Event
 
-func (event *Event) CreateEvent() error {
+func (event *Event) CreateEvent() string {
 	OpenSQL()
-	statement := "insert into event (name,date,create_time) values(?,?,?)"
+	//認証キーの取得
+	key := createAuthKey()
+	statement := "insert into event (auth_key,name,date,create_time) values(?,?,?,?)"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		fmt.Println("Prepare error")
-		return err
+		return ""
 	}
 	t := time.Now()
 
 	defer stmt.Close()
-	stmt.Exec(event.Name, event.Date, t)
+	stmt.Exec(key, event.Name, event.Date, t)
 
 	if err != nil {
 		fmt.Println("Exec error")
 
-		return err
+		return ""
 	}
-	return err
+	return key
+}
+
+func createAuthKey() string {
+	var rs1Letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+
+	key := make([]rune, 16)
+	for i := range key {
+		key[i] = rs1Letters[rand.Intn(len(rs1Letters))]
+	}
+	return string(key)
 }
