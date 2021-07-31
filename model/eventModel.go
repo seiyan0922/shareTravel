@@ -35,7 +35,7 @@ func (event *Event) CreateEvent() string {
 func GetEvent(event *Event) *Event {
 	OpenSQL()
 
-	err := Db.QueryRow("SELECT name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Name, &event.Date)
+	err := Db.QueryRow("SELECT id,name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.Name, &event.Date)
 
 	if err != nil {
 		fmt.Println("Exec error")

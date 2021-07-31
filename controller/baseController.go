@@ -38,7 +38,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 }
 
 //
-var validPath = regexp.MustCompile("^/(top|event)/([a-zA-Z0-9/]+)$")
+var validPath = regexp.MustCompile("^/(top|event|member)/([a-zA-Z0-9/]+)$")
 
 //
 func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {

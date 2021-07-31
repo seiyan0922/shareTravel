@@ -14,6 +14,7 @@ func main() {
 	http.HandleFunc("/create/", controller.MakeHandler(controller.CreateUserHandler))
 	http.HandleFunc("/index/", controller.MakeHandler(controller.IndexUserHandler))
 	http.HandleFunc("/event/", controller.MakeHandler(controller.EventHandler))
+	http.HandleFunc("/member/", controller.MakeHandler(controller.MemberHandler))
 
 	//cssファイルへのハンドラを定義
 	http.Handle("/layout/", http.StripPrefix("/layout/", http.FileServer(http.Dir("layout/"))))
