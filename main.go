@@ -4,15 +4,7 @@ import (
 	"log"
 	"net/http"
 	"shareTravel/controller"
-	"shareTravel/sessions"
 )
-
-var globalSessions *sessions.Manager
-
-//この後init関数で初期化されます。
-func init() {
-	globalSessions, _ = sessions.NewManager("memory", "gosessionid", 3600)
-}
 
 func main() {
 	http.Handle("/", http.FileServer(http.Dir("static")))
