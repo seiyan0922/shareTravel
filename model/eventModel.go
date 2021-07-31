@@ -32,6 +32,19 @@ func (event *Event) CreateEvent() string {
 	return key
 }
 
+func GetEvent(event *Event) *Event {
+	OpenSQL()
+
+	err := Db.QueryRow("SELECT name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Name, &event.Date)
+
+	if err != nil {
+		fmt.Println("Exec error")
+		panic(err.Error())
+	}
+
+	return event
+}
+
 func createAuthKey() string {
 	var rs1Letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 

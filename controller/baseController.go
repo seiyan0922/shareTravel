@@ -44,7 +44,6 @@ var validPath = regexp.MustCompile("^/(top|event)/([a-zA-Z0-9/]+)$")
 func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
-		fmt.Println(m)
 		fn(w, r, m[2])
 	}
 }

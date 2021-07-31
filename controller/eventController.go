@@ -58,5 +58,11 @@ func saveEventHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func showEventHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	event := new(model.Event)
+	param := query.Encode()
+	event.AuthKey = strings.Split(param, "=")[1]
+	event = model.GetEvent(event)
+	RenderTemplate(w, "view/event/show", event)
 
 }
