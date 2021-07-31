@@ -15,9 +15,9 @@ const (
 	DefaultCookieName  = "default-cookie"  // デフォルトCookie名
 )
 
-/* ******************* *
-* セッション構造体
-* ****** */
+/*
+ セッション構造体
+*/
 type Session struct {
 	cookieName string
 	ID         string
@@ -27,9 +27,9 @@ type Session struct {
 	Values     map[string]interface{}
 }
 
-/* ******************* *
-* 新規セッション生成
-* ****** */
+/*
+新規セッション生成
+*/
 func NewSession(manager *Manager, cookieName string) *Session {
 	return &Session{
 		cookieName: cookieName,
@@ -38,9 +38,9 @@ func NewSession(manager *Manager, cookieName string) *Session {
 	}
 }
 
-/* ******************* *
-* セッションの開始
-* ****** */
+/*
+セッションの開始
+*/
 func StartSession(sessionName, cookieName string, manager *Manager) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var session *Session
@@ -60,66 +60,66 @@ func StartSession(sessionName, cookieName string, manager *Manager) gin.HandlerF
 	}
 }
 
-/* ******************* *
-* デフォルトセッションの開始
-* ****** */
+/*
+デフォルトセッションの開始
+*/
 func StartDefaultSession(manager *Manager) gin.HandlerFunc {
 	return StartSession(DefaultSessionName, DefaultCookieName, manager)
 }
 
-/* ******************* *
-* セッションの取得
-* ****** */
+/*
+セッションの取得
+*/
 func GetSession(c *gin.Context, sessionName string) *Session {
 	return c.MustGet(sessionName).(*Session)
 }
 
-/* ******************* *
-* デフォルトセッションの取得
-* ****** */
+/*
+デフォルトセッションの取得
+*/
 func GetDefaultSession(c *gin.Context) *Session {
 	return GetSession(c, DefaultSessionName)
 }
 
-/* ******************* *
-* セッションの保存
-* ****** */
+/*
+セッションの保存
+*/
 func (s *Session) Save() error {
 	return s.manager.Save(s.request, s.writer, s)
 }
 
-/* ******************* *
-* セッション名の取得
-* ****** */
+/*
+セッション名の取得
+*/
 func (s *Session) Name() string {
 	return s.cookieName
 }
 
-/* ******************* *
-* セッション変数値の取得
-* ****** */
+/*
+セッション変数値の取得
+*/
 func (s *Session) Get(key string) (interface{}, bool) {
 	ret, exists := s.Values[key]
 	return ret, exists
 }
 
-/* ******************* *
-* セッション変数値のセット
-* ****** */
+/*
+セッション変数値のセット
+*/
 func (s *Session) Set(key string, val interface{}) {
 	s.Values[key] = val
 }
 
-/* ******************* *
-* セッション変数の削除
-* ****** */
+/*
+セッション変数の削除
+*/
 func (s *Session) Delete(key string) {
 	delete(s.Values, key)
 }
 
-/* ******************* *
-* セッションの削除
-* ****** */
+/*
+セッションの削除
+*/
 func (s *Session) Terminate() {
 	s.manager.Destroy(s.ID)
 }
