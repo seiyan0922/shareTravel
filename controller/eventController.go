@@ -29,20 +29,10 @@ func createEventHandler(w http.ResponseWriter, r *http.Request) {
 
 func confirmEventHandler(w http.ResponseWriter, r *http.Request) {
 	event := new(form.Event)
-
 	event.Name = r.FormValue("name")
 	event.Date = r.FormValue("datetime")
-	// //セッション開始
-	// manager := sessions.NewManager()
-	// sessions.StartDefaultSession(manager)
-	// //セッション変数の設定※ここでエラー
-	// session, _ := manager.Get(r, sessions.DefaultCookieName)
-	// session.Set("event", event)
-	// //セッションの保存
-	// session.Save()
 
 	RenderTemplate(w, "view/event/confirm", event)
-
 }
 
 func saveEventHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,11 +48,18 @@ func saveEventHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func showEventHandler(w http.ResponseWriter, r *http.Request) {
+
 	event := new(model.Event)
 	query := r.URL.Query()
 	param := query.Encode()
 	event.AuthKey = strings.Split(param, "=")[1]
 	event = model.GetEvent(event)
-	RenderTemplate(w, "view/event/show", event)
+	members := model.GetMembers(event.Id)
+
+	status := make(map[string]interface{})
+	status["Event"] = event
+	status["Members"] = members
+
+	RenderTemplate(w, "view/event/show", status)
 
 }

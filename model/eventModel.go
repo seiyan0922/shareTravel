@@ -39,10 +39,47 @@ func GetEvent(event *Event) *Event {
 
 	if err != nil {
 		fmt.Println("Exec error")
-		panic(err.Error())
+		return nil
 	}
 
 	return event
+}
+
+func (event *Event) UpdatePool() {
+
+	var pool int
+
+	OpenSQL()
+	//現在の端数プールを取得
+	err := Db.QueryRow("SELECT pool FROM event WHERE id = ?", event.Id).Scan(&pool)
+
+	if err != nil {
+		//変数書き換えに失敗した場合終了
+		fmt.Println("Exec error in SELECT")
+		return
+	}
+
+	//レコードの更新処理
+	statement := "UPDATE event SET pool = ?,update_time = ? WHERE id = ?"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		fmt.Println("Prepare error")
+		return
+	}
+
+	//現在時刻を取得
+	t := time.Now()
+
+	//処理終了後データソースを閉じる
+	defer stmt.Close()
+
+	//SQL実行
+	stmt.Exec(pool, t, event.Id)
+
+	if err != nil {
+		fmt.Println("Exec error in UPDATE")
+		return
+	}
 }
 
 func createAuthKey() string {

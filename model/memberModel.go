@@ -25,3 +25,25 @@ func (member *Member) SaveMember() {
 		fmt.Println("Exec error")
 	}
 }
+
+func GetMembers(id int) []Member {
+	OpenSQL()
+	rows, err := Db.Query("SELECT id,name from member WHERE event_id = ?", id)
+
+	if err != nil {
+		fmt.Println("Query Error")
+	}
+
+	var members []Member
+
+	for rows.Next() {
+		member := Member{}
+		err := rows.Scan(&member.Id, &member.Name)
+		if err != nil {
+			fmt.Println("Scan error")
+			panic(err.Error())
+		}
+		members = append(members, member)
+	}
+	return members
+}
