@@ -12,9 +12,6 @@ func CreateMemberExpense(event_id int, expense *Expense, each_price int) error {
 	//イベント参加者を全て取得
 	rows, _ := Db.Query("SELECT id FROM member WHERE event_id = ?", event_id)
 
-	fmt.Println("通った10")
-	fmt.Println(expense.Id)
-
 	var members_id []int
 
 	for rows.Next() {
@@ -28,33 +25,32 @@ func CreateMemberExpense(event_id int, expense *Expense, each_price int) error {
 			fmt.Println("Scan error")
 			return err
 		}
-		members_id = append(members_id, member_id)
+		if member_id != 0 {
+			fmt.Println(member_id)
+			fmt.Println(members_id)
+			members_id = append(members_id, member_id)
+		}
 	}
-	fmt.Println("通った11")
 
 	t := time.Now()
 
-	statement := "INSERT INTO member_expense (member_id,event_id,expense_id,price,craete_time) VALUES(?,?,?,?,?)"
+	statement := "INSERT INTO member_expense (member_id,event_id,expense_id,price,create_time) VALUES(?,?,?,?,?)"
 	stmt, err := Db.Prepare(statement)
-	defer stmt.Close()
 
-	fmt.Println("通った13")
-
-	for member_id := range members_id {
-		fmt.Printf("何かがおかしいメンバーID：%d、イベントID：%d、金額ID:%d,個別の負担：%d", member_id, event_id, expense.Id, each_price)
-
+	for _, member_id := range members_id {
 		_, err := stmt.Exec(member_id, event_id, expense.Id, each_price, t)
 
 		fmt.Println(err)
 
 	}
 
+	defer stmt.Close()
+
 	if err != nil {
 		fmt.Println("Exec error")
 
 		return err
 	}
-	fmt.Println("通った14")
 
 	return nil
 }

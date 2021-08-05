@@ -12,7 +12,6 @@ import (
 
 func ExpenseHandler(w http.ResponseWriter, r *http.Request, path string) {
 	arr := strings.Split(path, "/")
-	fmt.Println("コントローラーきた")
 	switch arr[0] {
 	case "add":
 		addExpenseHandler(w, r)
@@ -45,33 +44,28 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	//POSTデータ：備考を取得
 	remarks := r.FormValue("remarks")
 
-	//支払い構造体ポインタ
+	//支払いポインタ
 	expense := new(model.Expense)
 
-	//クエリパラメーターからイベントIDを取得
+	//データの格納
 	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
 
-	//イベントIDを格納
 	expense.EventId = event_id
 
-	//名前を格納
 	expense.Name = name
 
-	//金額を格納
 	expense.Total = total
 
-	//備考を格納
 	expense.Remarks = remarks
 
-	fmt.Println("通った")
 	//支払い情報を保存
-	expense.AddExpense()
+	expense.Id = expense.AddExpense()
+
+	fmt.Println(expense.Id)
 
 	//各参加者の負担金の登録
 	//イベントIDから参加者データを取得
 	members := model.GetMembers(event_id)
-
-	fmt.Println("通った2")
 	//参加者人数を取得
 	member_count := len(members)
 
@@ -83,15 +77,10 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 		event := new(model.Event)
 		event.Id = event_id
 		event.UpdatePool()
-		fmt.Println("通ったv")
 	}
-	fmt.Println("通った3")
-
-	fmt.Printf("渡した値：%d,%d,%d", event_id, each_price, expense.Total)
 
 	//イベント参加者各位の負担金額を保存する
 	err := model.CreateMemberExpense(event_id, expense, each_price)
-	fmt.Println("通った4")
 	if err != nil {
 		fmt.Println(err)
 	}

@@ -12,7 +12,7 @@ func init() {
 	OpenSQL()
 }
 
-func (expense *Expense) AddExpense() {
+func (expense *Expense) AddExpense() int {
 
 	statement := "INSERT INTO expense (event_id,name,total,remarks,create_time) VALUES(?,?,?,?,?)"
 
@@ -28,5 +28,12 @@ func (expense *Expense) AddExpense() {
 	if err != nil {
 		fmt.Println("Exec error")
 	}
+	var id int
+	err2 := Db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&id)
 
+	if err2 != nil {
+		return 0
+	}
+
+	return id
 }

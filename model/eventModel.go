@@ -60,7 +60,7 @@ func (event *Event) UpdatePool() {
 	}
 
 	//レコードの更新処理
-	statement := "UPDATE event SET pool = ?,update_time = ? WHERE id = ?"
+	statement := "UPDATE event SET pool = ?,update_time = ? WHERE id = ?;"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		fmt.Println("Prepare error")
