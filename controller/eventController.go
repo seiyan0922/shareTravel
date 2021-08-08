@@ -19,6 +19,8 @@ func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
 		saveEventHandler(w, r)
 	case "show":
 		showEventHandler(w, r)
+	case "search":
+		searchEventHandler(w, r)
 
 	}
 }
@@ -54,6 +56,12 @@ func showEventHandler(w http.ResponseWriter, r *http.Request) {
 	param := query.Encode()
 	event.AuthKey = strings.Split(param, "=")[1]
 	event = model.GetEvent(event)
+	showEventRender(w, event)
+
+}
+
+//イベントTOP表示共通処理
+func showEventRender(w http.ResponseWriter, event *model.Event) {
 	members := model.GetMembers(event.Id)
 
 	status := make(map[string]interface{})
@@ -62,4 +70,32 @@ func showEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	RenderTemplate(w, "view/event/show", status)
 
+}
+
+func searchEventHandler(w http.ResponseWriter, r *http.Request) {
+
+	//リクエストメソッドによる条件分岐
+	switch r.Method {
+	case "GET":
+		//GETの場合テンプレートを読み込み
+		RenderTemplate(w, "view/event/search", nil)
+	case "POST":
+		//POSTの場合認証キーから該当のイベントを検索
+		auth_key := r.FormValue("auth_key")
+
+		event := new(model.Event)
+		event.AuthKey = auth_key
+
+		event = model.GetEvent(event)
+
+		//イベント取得に成功した場合
+		if event != nil {
+			//イベントTOPページの読み込み
+			showEventRender(w, event)
+
+		} else {
+			RenderTemplate(w, "view/event/search", nil)
+		}
+
+	}
 }

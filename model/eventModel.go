@@ -38,7 +38,6 @@ func GetEvent(event *Event) *Event {
 	err := Db.QueryRow("SELECT id,name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.Name, &event.Date)
 
 	if err != nil {
-		fmt.Println("Exec error")
 		return nil
 	}
 

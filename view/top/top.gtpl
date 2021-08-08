@@ -6,7 +6,7 @@
             <a class="" href = "/event/create">New Event</a>
         </div>
         <div>
-            <a class="" href = "/event/create">Serch Event</a>
+            <a class="" href = "/event/search">Serch Event</a>
         </div>
     </div>
 </div>
