@@ -19,10 +19,117 @@ body{
 
 /* body共通設定 */
 .body{
-    padding:0 200px;
-    text-align:center;
+
+}
+/* TOPページ */
+.top-image{
+    background-image: url("/img/travel_arrangement_heder.jpeg");
+    background-position:40% 10%;
+    background-repeat: no-repeat;
+    height: 400px;
 }
 
+.top-box{
+    height: 400px;
+    background-color: rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.top-text{
+    font-family: 'arial black';
+    font-size: 32px;
+    padding-top:140px;
+    color:#FFFFFF;
+
+}
+
+.top-introduction{
+    margin-top:100px;
+    text-align: center;
+    padding:0 100px;
+}
+
+.gray-line{
+    height: 4px;
+    background-color: #dcdcdc;
+    margin:20px 0;
+    border-radius: 20%;
+}
+.top-introduction-first-title{
+    font-family: 'Times New Roman';
+    font-size:32px;
+}
+
+.top-introduction-first-text{
+    padding:0 120px;
+    font-size:15px;
+    text-align: left;
+}
+
+.top-introduction-second{
+    margin-top:100px;
+}
+
+.top-buttons{
+    margin: 80px 200px;
+}
+
+
+.new-event-button{
+	display: block;
+	cursor: pointer;
+	max-width: 300px;
+	margin: 1em auto;
+	padding: 20px;
+	border-radius: 4px;
+	box-sizing: border-box;
+	color: #fff;
+	text-align: center;
+	text-decoration: inherit;
+	background: #20b2aa;
+	box-shadow: 0 6px 0 #047c71, 0 12px 0 rgba(0,0,0,.2);
+	transition: color .3s, background .3s, box-shadow .3s, transform 0.3s;
+}
+.new-event-button:hover {
+	background: #3cc4bd;
+	box-shadow: 0 3px 0 #12978d, 0 6px 0 rgba(0,0,0,.2);
+	transform: translateY(3px);
+}
+.new-event-button:active {
+	color: #ddd;
+	background: #12978d;
+	box-shadow: 0 0 0 #047c71, 0 0 0 rgba(0,0,0,.2);
+	transform: translateY(6px);
+	transition-duration: .1s;
+}
+
+.search-event-button{
+	display: block;
+	cursor: pointer;
+	max-width: 300px;
+	margin: 3em auto;
+	padding: 20px;
+	border-radius: 4px;
+	box-sizing: border-box;
+	color: #fff;
+	text-align: center;
+	text-decoration: inherit;
+	background: #14c7df;
+	box-shadow: 0 6px 0 #049eb3, 0 12px 0 rgba(0,0,0,.2);
+	transition: color .3s, background .3s, box-shadow .3s, transform 0.3s;
+}
+.search-event-button:hover {
+	background: #14c7df;
+	box-shadow: 0 3px 0 #049eb3, 0 6px 0 rgba(0,0,0,.2);
+	transform: translateY(3px);
+}
+.search-event-button:active {
+	color: #ddd;
+	background: #14c7df;
+	box-shadow: 0 0 0 #049eb3, 0 0 0 rgba(0,0,0,.2);
+	transform: translateY(6px);
+	transition-duration: .1s;
+}
 
 /* フッター設定 */
 .common-footer{
@@ -30,8 +137,7 @@ body{
     width:100%;
     background-color: #222222;
     text-align:right;
-    position: absolute;
-    bottom:0;
+
 }
 
 .made-by{

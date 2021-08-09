@@ -19,6 +19,7 @@ func main() {
 
 	//cssファイルへのハンドラを定義
 	http.Handle("/layout/", http.StripPrefix("/layout/", http.FileServer(http.Dir("layout/"))))
+	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img/"))))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
