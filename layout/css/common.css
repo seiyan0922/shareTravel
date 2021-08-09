@@ -1,6 +1,11 @@
+html {
+    height: 100%;
+  }
+
 body{
     margin:0;
     padding:0;
+    height:100%;
 }
 
 /* ヘッダー設定 */
@@ -18,9 +23,123 @@ body{
 }
 
 /* body共通設定 */
-.body{
-
+.container{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
+
+
+/* サイドバー共通 */
+.side-bar{
+    float:left;
+    width:75px;
+    height:500px;
+    margin-right:30px;
+    padding-top:30px;
+}
+
+.member-icon{
+    height: 30px;
+    width:30px;
+    background-image:url("/img/member.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin:auto;
+}
+
+.add-member-text{
+    font-size:10px;
+    text-align: center;
+    color:rgb(175, 173, 173);
+}
+
+.expense-icon{
+    height: 30px;
+    width:30px;
+    background-image:url("/img/expense.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin:30px auto 5px;
+}
+
+.expense-text{
+    font-size:10px;
+    text-align: center;
+    color:rgb(175, 173, 173);
+}
+
+.download-icon{
+    height: 30px;
+    width:30px;
+    background-image:url("/img/download.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin:30px auto 5px;
+}
+
+.download-text{
+    font-size:10px;
+    text-align: center;
+    color:rgb(175, 173, 173);
+}
+
+/* 入力欄共通 */
+.form-common{
+    width:150px;
+    height:20px;
+}
+
+.common-submit-box{
+    width:100%;
+    text-align:center;
+}
+
+.submit-common {
+    background-color: #fff;
+    border: 1px solid #333;
+    color: #333;
+    line-height: 30px;
+    width:80px;
+    margin:30px 0;
+  }
+  .submit-common:hover {
+    color: #fff;
+    transition: 0.5s ;
+  }
+  .submit-common:hover {
+    top: 0;
+    background-color: #333;
+    transition: 0.5s ;
+  }
+
+/* 確認画面枠共通 */
+.confirm-common{
+    width:500px;
+    margin:30px auto;
+    padding:50px 0 0 0;
+    border:solid 1px;
+    
+}
+
+.confirm-message{
+   text-align:center;
+   font-family: 'Hiragino Mincho Pro';
+   font-size:13px;
+}
+
+/* 戻るボタン共通 */
+
+.back-common-box{
+    text-align:center;
+    margin-bottom:20px;
+}
+.back-common{
+    color:#000000;
+    font-size:13px;
+   
+}
+
 /* TOPページ */
 .top-image{
     background-image: url("/img/travel_arrangement_heder.jpeg");
@@ -131,17 +250,127 @@ body{
 	transition-duration: .1s;
 }
 
+
+/* 新規イベント作成画面 */
+.new-event-page{
+    padding:60px 150px;
+}
+
+.new-event-title{
+    font-family: 'Times New Roman';
+    font-size:32px;
+    text-align: center;
+}
+
+.new-event-form-box{
+    padding: 3em 1em 0 1em;
+    margin: 2em auto;
+    width:350px;
+    color: #5d627b;
+    background: white;
+    border-top: solid  2px #5d627b;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.22);
+}
+
+.form-table{
+    margin:auto;
+    font-family: 'Hiragino Mincho Pro';
+}
+
+/* 新規作成完了 */
+.authkey-confirm{
+    text-align:center;
+    margin:50px auto 5px auto;
+    font-family: 'Hiragino Mincho Pro';
+}
+.red{
+    color:red;
+}
+
+.alert-authkey{
+    text-align:center;
+    font-family: 'Hiragino Mincho Pro';
+    font-size: 12px;
+    margin-bottom:30px;
+
+}
+
+/* イベント詳細ページ */
+.event-header{
+    background-color:#FFFFFF;
+    height:300px;
+    padding-top:30px;
+    padding-left:50px;
+}
+
+.event-icon{
+    width:100px;
+    border-radius: 100%;
+    height: 100px;
+    background-color:#DCDCDC;
+    float:left;
+    margin:20px;
+    background-image: url('/img/icon1.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.event-info{
+    padding:27px 0;
+}
+
+.event-name{
+    font-size:24px;
+}
+
+.event-time{
+    color:#C0C0C0;
+    font-size:14px;
+}
+
+.event-key{
+    color:#C0C0C0;
+    font-size:14px;
+}
+
+.event-top-tab{
+    margin-top:20px;
+}
+
+.event-top-tab li{
+    display:inline;
+}
+
+.event-top-tab .tab-item{
+    padding:10px 20px;
+}
+
+.event-top-tab .under-line{
+    border-bottom: solid 3px;
+    border-color: grey;
+}
+
+.tab-link{
+    color:#C0C0C0;
+    text-decoration: none;
+}
+
+.tab-link:hover{
+    color:#808080;
+}
+
 /* フッター設定 */
 .common-footer{
     height:50px;
     width:100%;
     background-color: #222222;
     text-align:right;
+    margin-top: auto;
 
 }
 
 .made-by{
-    margin:20px 10px 0 0;
+    margin:0 10px 0 0;
     font-size:12px;
     font-family: HiraMinProN-W6;
     color:cornsilk;

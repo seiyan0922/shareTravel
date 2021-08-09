@@ -4,10 +4,11 @@
 <head>
     <link rel="stylesheet" type="text/css" href="/layout/css/common.css">
     <meta charset="UTF-8">
-    <title>ラクワリ（仮）</title>
+    <title>Share-Travel</title>
 </head>
 <body>
-    <div class="common-header">
-        <div class="header-title">RA KU WA RI</div>
-    </div>
+    <div class="container">
+        <div class="common-header">
+            <div class="header-title">SHARE-TRAVEL</div>
+        </div>
 {{ end }}
