@@ -31,7 +31,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 	templates.ExecuteTemplate(w, "_footer.gtpl", nil)
 	err := templates.ExecuteTemplate(w, file+".gtpl", i)
 	if err != nil {
-		fmt.Println("error:not found")
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

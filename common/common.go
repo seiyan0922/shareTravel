@@ -10,3 +10,7 @@ func GetQueryParam(r *http.Request) string {
 	param := strings.Split(query, "=")[1]
 	return param
 }
+
+// func TimeFormatter(time string) string {
+
+// }

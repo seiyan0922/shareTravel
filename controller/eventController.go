@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"shareTravel/common"
 	"shareTravel/form"
 	"shareTravel/model"
 	"strings"
@@ -52,21 +53,21 @@ func saveEventHandler(w http.ResponseWriter, r *http.Request) {
 func showEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	event := new(model.Event)
-	query := r.URL.Query()
-	param := query.Encode()
-	event.AuthKey = strings.Split(param, "=")[1]
+	event.AuthKey = common.GetQueryParam(r)
 	event = model.GetEvent(event)
+
 	showEventRender(w, event)
 
 }
 
 //イベントTOP表示共通処理
 func showEventRender(w http.ResponseWriter, event *model.Event) {
-	members := model.GetMembers(event.Id)
 
+	expenses := event.GetExpensesByEventId()
 	status := make(map[string]interface{})
-	status["Event"] = event
-	status["Members"] = members
+	status["Event"] = &event
+	status["Expenses"] = &expenses
+	fmt.Println(status["Expenses"])
 
 	RenderTemplate(w, "view/event/show", status)
 

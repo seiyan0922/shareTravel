@@ -37,3 +37,33 @@ func (expense *Expense) AddExpense() int {
 
 	return id
 }
+
+func (event *Event) GetExpensesByEventId() []Expense {
+
+	//DB接続
+	OpenSQL()
+	rows, err := Db.Query("SELECT total,name,remarks,create_time from expense WHERE event_id = ?", event.Id)
+
+	//SQLエラー処理
+	if err != nil {
+		fmt.Println("Query Error")
+		return nil
+	}
+
+	//DBからの取得データをスライスに変換
+	var expenses []Expense
+
+	for rows.Next() {
+		expense := Expense{}
+		err := rows.Scan(&expense.Total, &expense.Name, &expense.Remarks, &expense.CreateTime)
+		if err != nil {
+			fmt.Println("Scan error")
+			panic(err.Error())
+		}
+		expenses = append(expenses, expense)
+
+	}
+
+	//値の返却
+	return expenses
+}

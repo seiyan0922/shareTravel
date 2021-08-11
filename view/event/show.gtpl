@@ -42,6 +42,28 @@
             </div>
         </div>
         <div class="event-main">
+            <div>
+                {{if ne .Expenses nil}}
+                    <table>
+                        <tr>
+                            <th>Name</th><th>Total</th><th>DateTime</th><th>Remarks</th>
+                        </tr>
+                        
+                            {{range $expense := .Expenses}}
+                                <tr>
+                                    <td>{{$expense.Name}}</td>
+                                    <td>{{$expense.Total}}</td>
+                                    <td>{{$expense.CreateTime}}</td>
+                                    <td>{{$expense.Remarks}}</td>
+                                </tr>
+
+                            {{end}}
+                        
+                    </table>
+                {{else}}
+                    <div>会計データがありません</div>
+                {{end}}
+            </div>
         </div>
     </div>
 </div>
