@@ -35,7 +35,16 @@ func (event *Event) CreateEvent() string {
 func GetEvent(event *Event) *Event {
 	OpenSQL()
 
-	err := Db.QueryRow("SELECT id,name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.Name, &event.Date)
+	var err error
+
+	if event.Id != 0 {
+		err = Db.QueryRow("SELECT id,name,date FROM event WHERE id = ?", event.Id).Scan(&event.Id, &event.Name, &event.Date)
+	} else if event.AuthKey != "" {
+		err = Db.QueryRow("SELECT id,name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.Name, &event.Date)
+	} else {
+		fmt.Println("it has no id and authkey")
+		return nil
+	}
 
 	if err != nil {
 		return nil

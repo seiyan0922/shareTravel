@@ -43,25 +43,22 @@
         </div>
         <div class="event-main">
             <div>
-                {{if ne .Expenses nil}}
+                {{if ne .Members nil}}
                     <table>
                         <tr>
-                            <th>Name</th><th>Total</th><th>DateTime</th><th>Remarks</th>
+                            <th>Name</th>
                         </tr>
                         
-                            {{range $expense := .Expenses}}
+                            {{range $member := .Members}}
                                 <tr>
-                                    <td>{{$expense.Name}}</td>
-                                    <td>{{$expense.Total}}円</td>
-                                    <td>{{$expense.CreateTime}}</td>
-                                    <td>{{$expense.Remarks}}</td>
+                                    <td>{{$member.Name}}</td>
                                 </tr>
 
                             {{end}}
                         
                     </table>
                 {{else}}
-                    <div>会計データがありません</div>
+                    <div>参加者がいません</div>
                 {{end}}
             </div>
         </div>

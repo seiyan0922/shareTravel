@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"shareTravel/common"
 	"shareTravel/form"
 	"time"
 )
@@ -60,6 +61,7 @@ func (event *Event) GetExpensesByEventId() []Expense {
 			fmt.Println("Scan error")
 			panic(err.Error())
 		}
+		expense.CreateTime = common.TimeFormatter(expense.CreateTime)
 		expenses = append(expenses, expense)
 
 	}

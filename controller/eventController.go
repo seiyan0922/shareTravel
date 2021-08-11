@@ -6,6 +6,7 @@ import (
 	"shareTravel/common"
 	"shareTravel/form"
 	"shareTravel/model"
+	"strconv"
 	"strings"
 )
 
@@ -22,6 +23,8 @@ func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
 		showEventHandler(w, r)
 	case "search":
 		searchEventHandler(w, r)
+	case "indexMember":
+		showMembersEventHandler(w, r)
 
 	}
 }
@@ -67,9 +70,28 @@ func showEventRender(w http.ResponseWriter, event *model.Event) {
 	status := make(map[string]interface{})
 	status["Event"] = &event
 	status["Expenses"] = &expenses
-	fmt.Println(status["Expenses"])
 
 	RenderTemplate(w, "view/event/show", status)
+
+}
+
+func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
+	event := new(model.Event)
+	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
+	event.Id = event_id
+	members := model.GetMembers(event_id)
+	event = model.GetEvent(event)
+	showMembersEventRender(w, event, &members)
+
+}
+
+func showMembersEventRender(w http.ResponseWriter, event *model.Event, members *[]model.Member) {
+
+	status := make(map[string]interface{})
+	fmt.Println(event)
+	status["Event"] = event
+	status["Members"] = members
+	RenderTemplate(w, "view/event/showMember", status)
 
 }
 

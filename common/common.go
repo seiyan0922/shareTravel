@@ -11,6 +11,15 @@ func GetQueryParam(r *http.Request) string {
 	return param
 }
 
-// func TimeFormatter(time string) string {
+func TimeFormatter(datetime string) string {
+	arr := strings.Split(datetime, "-")
+	year := arr[0]
+	month := arr[1]
+	arr2 := strings.Split(arr[2], "T")
+	day := arr2[0]
+	var time string = strings.Replace(arr2[1], "Z", "", 1)
 
-// }
+	formated := year + "年" + month + "月" + day + "日" + time
+
+	return formated
+}

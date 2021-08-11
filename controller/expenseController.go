@@ -61,8 +61,6 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	//支払い情報を保存
 	expense.Id = expense.AddExpense()
 
-	fmt.Println(expense.Id)
-
 	//各参加者の負担金の登録
 	//イベントIDから参加者データを取得
 	members := model.GetMembers(event_id)

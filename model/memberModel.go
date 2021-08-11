@@ -27,7 +27,9 @@ func (member *Member) SaveMember() {
 }
 
 func GetMembers(id int) []Member {
+
 	OpenSQL()
+
 	rows, err := Db.Query("SELECT id,name from member WHERE event_id = ?", id)
 
 	if err != nil {
@@ -45,5 +47,6 @@ func GetMembers(id int) []Member {
 		}
 		members = append(members, member)
 	}
+
 	return members
 }
