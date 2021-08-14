@@ -25,6 +25,8 @@ func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
 		searchEventHandler(w, r)
 	case "indexMember":
 		showMembersEventHandler(w, r)
+	case "edit":
+		editEventHandler(w, r)
 	}
 }
 
@@ -125,6 +127,32 @@ func searchEventHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			RenderTemplate(w, "view/event/search", nil)
 		}
+	}
+}
+
+//イベント設計ページ
+func editEventHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Encode()
+	qarr := strings.Split(query, "=")
+	event := new(model.Event)
+	event.Id, _ = strconv.Atoi(qarr[1])
+
+	//リクエストメソッドによる条件分岐
+	switch r.Method {
+	case "GET":
+		event = model.GetEvent(event)
+
+		//イベント編集テンプレートの読み込み
+		RenderTemplate(w, "view/event/edit", event)
+
+	case "POST":
+		event.AuthKey = r.FormValue("auth_key")
+		event.Name = r.FormValue("name")
+		event.Date = r.FormValue("date")
+		fmt.Println(r.FormValue("date"))
+		event.UpdateEvent()
+
+		showEventRender(w, event)
 
 	}
 }

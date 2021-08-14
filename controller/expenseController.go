@@ -74,7 +74,7 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	if fraction := total % member_count; fraction != 0 {
 		event := new(model.Event)
 		event.Id = event_id
-		event.UpdatePool()
+		event.UpdatePool(fraction)
 	}
 
 	//イベント参加者各位の負担金額を保存する

@@ -3,17 +3,17 @@
     <div class="content">
         <div class="side-bar">
             <div class="icon-common">
-                <a href="" class="member-add">
+                <a href="/member/add?event_id={{.Id}}" class="member-add">
                     <div class="member-icon"></div>
                     <div class="add-member-text">メンバー追加</div>
                 </a>
             </div>
-            <div class="icon-common">
-                <a href="" class="member-add">
+            <a href="/expense/add?event_id={{.Id}}" class="member-add">
+                <div class="icon-common">
                     <div class="expense-icon"></div>
                     <div class="expense-text">会計追加</div>
-                </a>
-            </div>
+                </div>
+            </a>
             <div class="icon-common">
                 <a href="" class="member-add">
                     <div class="download-icon"></div>

@@ -44,19 +44,17 @@
         <div class="event-main">
             <div>
                 {{if ne .Members nil}}
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                        </tr>
-                        
-                            {{range $member := .Members}}
-                                <tr>
-                                    <td>{{$member.Name}}</td>
-                                </tr>
+                <table class="event-top-table">
+                    <tr class="event-top-table-top">
+                        <th>Name</th>
+                    </tr>
+                        {{range $member := .Members}}
+                            <tr class="event-top-table-content">
+                                <td class="item-name">{{$member.Name}}</td>
+                            </tr>
 
-                            {{end}}
-                        
-                    </table>
+                        {{end}}
+                </table>
                 {{else}}
                     <div>参加者がいません</div>
                 {{end}}

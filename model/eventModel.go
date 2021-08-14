@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 	"math/rand"
+	"shareTravel/common"
 	"shareTravel/form"
 	"time"
 )
@@ -50,10 +51,12 @@ func GetEvent(event *Event) *Event {
 		return nil
 	}
 
+	event.Date = common.TimeFormatterHyphen(event.Date)
+
 	return event
 }
 
-func (event *Event) UpdatePool() {
+func (event *Event) UpdatePool(add int) {
 
 	var pool int
 
@@ -81,13 +84,11 @@ func (event *Event) UpdatePool() {
 	//処理終了後データソースを閉じる
 	defer stmt.Close()
 
+	//端数をプールに加算
+	pool = pool + add
+
 	//SQL実行
 	stmt.Exec(pool, t, event.Id)
-
-	if err != nil {
-		fmt.Println("Exec error in UPDATE")
-		return
-	}
 }
 
 func createAuthKey() string {
@@ -98,4 +99,24 @@ func createAuthKey() string {
 		key[i] = rs1Letters[rand.Intn(len(rs1Letters))]
 	}
 	return string(key)
+}
+
+func (event *Event) UpdateEvent() {
+	OpenSQL()
+	fmt.Println(event)
+
+	statement := "UPDATE event SET auth_key = ? ,name = ?,date = ? WHERE id = ? "
+
+	stmt, err := Db.Prepare(statement)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	//処理終了後データソースを閉じる
+	defer stmt.Close()
+
+	stmt.Exec(event.AuthKey, event.Name, event.Date, event.Id)
+
 }

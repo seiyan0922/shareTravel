@@ -43,7 +43,7 @@ func (event *Event) GetExpensesByEventId() []Expense {
 
 	//DB接続
 	OpenSQL()
-	rows, err := Db.Query("SELECT total,name,remarks,create_time from expense WHERE event_id = ?", event.Id)
+	rows, err := Db.Query("SELECT id,total,name,remarks,create_time from expense WHERE event_id = ?", event.Id)
 
 	//SQLエラー処理
 	if err != nil {
@@ -56,7 +56,7 @@ func (event *Event) GetExpensesByEventId() []Expense {
 
 	for rows.Next() {
 		expense := Expense{}
-		err := rows.Scan(&expense.Total, &expense.Name, &expense.Remarks, &expense.CreateTime)
+		err := rows.Scan(&expense.Id, &expense.Total, &expense.Name, &expense.Remarks, &expense.CreateTime)
 		if err != nil {
 			fmt.Println("Scan error")
 			panic(err.Error())

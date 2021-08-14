@@ -377,8 +377,73 @@ body{
 
 .event-main{
     background-color: #EEEEEE;
-    height:500px;
+    min-height:500px;
     width:100%;
+    padding:50px 0;
+}
+
+
+.event-top-table{
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin:auto;
+}
+
+.event-top-table tr{
+    border-bottom: solid 2px rgb(255, 255, 255);
+    height:50px;
+    
+}
+
+.event-top-table-top{
+    font-family: 'Times New Roman';
+
+}
+
+.event-top-table-content{
+    font-family: "Osaka";
+}
+
+.event-top-table-content .item-name{
+    min-width:100px;
+    text-align:right;
+}
+
+
+.event-top-table-content .item-total{
+    min-width:100px;
+    text-align:right;
+}
+
+.event-top-table-content .item-time{
+    min-width:150px;
+    text-align:right;
+    font-size:14px;
+}
+
+.event-top-table-content .item-remarks{
+    min-width:200px;
+    text-align:right;
+    font-size:12px;
+    padding-right:20px;
+}
+
+.event-top-table-content .item-link{
+    min-width:100px;
+    text-align:center;
+    font-size:12px;
+}
+
+.event-top-table-content .item-link a{
+    text-decoration: none;
+    color:#FFFFFF;
+
+}
+.event-top-table-content .item-link .botton{
+    margin:0 10px;
+    padding:6px 0;
+    border:solid 1px;
+    background-color: #363636;
 }
 
 /* 会計作成画面 */
