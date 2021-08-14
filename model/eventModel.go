@@ -38,9 +38,9 @@ func GetEvent(event *Event) *Event {
 	var err error
 
 	if event.Id != 0 {
-		err = Db.QueryRow("SELECT id,name,date FROM event WHERE id = ?", event.Id).Scan(&event.Id, &event.Name, &event.Date)
+		err = Db.QueryRow("SELECT id,auth_key,name,date FROM event WHERE id = ?", event.Id).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date)
 	} else if event.AuthKey != "" {
-		err = Db.QueryRow("SELECT id,name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.Name, &event.Date)
+		err = Db.QueryRow("SELECT id,auth_key,name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date)
 	} else {
 		fmt.Println("it has no id and authkey")
 		return nil

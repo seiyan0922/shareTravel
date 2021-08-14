@@ -31,10 +31,10 @@
 
             <div class="event-top-tab">
                 <ul>
-                    <li class="tab-item under-line">会計履歴</li>
-                    <a class="tab-link" href="/event/indexMember?event_id={{.Event.Id}}">
-                        <li class="tab-item">参加者一覧</li>
-                    </a>
+                    <a class="tab-link" href="/event/show?event_id={{.Event.Id}}">
+                        <li class="tab-item">会計履歴</li>
+                    </a>    
+                    <li class="tab-item  under-line">参加者一覧</li>
                     <a class="tab-link" href="/event/edit?event_id={{.Event.Id}}">
                         <li class="tab-item">設定</li>
                     </a>

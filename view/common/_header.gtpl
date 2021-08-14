@@ -9,6 +9,8 @@
 <body>
     <div class="container">
         <div class="common-header">
+            <a href="/top/">
             <div class="header-title">SHARE-TRAVEL</div>
+        </a>
         </div>
 {{ end }}

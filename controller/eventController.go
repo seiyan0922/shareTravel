@@ -25,7 +25,6 @@ func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
 		searchEventHandler(w, r)
 	case "indexMember":
 		showMembersEventHandler(w, r)
-
 	}
 }
 
@@ -56,7 +55,15 @@ func saveEventHandler(w http.ResponseWriter, r *http.Request) {
 func showEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	event := new(model.Event)
-	event.AuthKey = common.GetQueryParam(r)
+	query := r.URL.Query().Encode()
+	qarr := strings.Split(query, "=")
+
+	if qarr[0] == "event_id" {
+		event.Id, _ = strconv.Atoi(qarr[1])
+	} else {
+		event.AuthKey = qarr[1]
+	}
+
 	event = model.GetEvent(event)
 
 	showEventRender(w, event)
@@ -88,7 +95,6 @@ func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
 func showMembersEventRender(w http.ResponseWriter, event *model.Event, members *[]model.Member) {
 
 	status := make(map[string]interface{})
-	fmt.Println(event)
 	status["Event"] = event
 	status["Members"] = members
 	RenderTemplate(w, "view/event/showMember", status)

@@ -84,7 +84,7 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//テンプレートの読み込み
-	RenderTemplate(w, "view/expense/complete", nil)
+	RenderTemplate(w, "view/expense/complete", expense)
 
 }
 
