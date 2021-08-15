@@ -39,3 +39,32 @@ func memberSaveHandler(w http.ResponseWriter, r *http.Request) {
 
 	RenderTemplate(w, "view/member/complete", member)
 }
+
+func postMembersCnv(str_members string) []form.Member {
+
+	replaced1 := strings.Replace(str_members, "[", "", -1)
+	replaced2 := strings.Replace(replaced1, "]", "", -1)
+	replaced3 := strings.Replace(replaced2, "{", "", -1)
+
+	members_arr := strings.Split(replaced3, "} ")
+
+	var members []form.Member
+
+	for _, str_member := range members_arr {
+		member_arr := strings.Split(str_member, " ")
+
+		member_id, _ := strconv.Atoi(member_arr[0])
+		event_id, _ := strconv.Atoi(member_arr[1])
+		name := member_arr[2]
+
+		var member form.Member
+		member.Id = member_id
+		member.EventId = event_id
+		member.Name = name
+
+		members = append(members, member)
+	}
+
+	return members
+
+}

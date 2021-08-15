@@ -46,13 +46,13 @@
                     </table>
                     <div class="expense-info">※金額は各参加者に等分されます。</div>
                     <div class="expense-info"></div>
-                    <form action="/expense/complete?event_id={{.Id}}" method="POST">
+                    <form action="/expense/complete?event_id={{.Event.Id}}" method="POST">
                         <table class="form-table">
                             {{$price := .Price}}
                             {{range $member := .Members}}
                             <tr>
                                 <td>{{$member.Name}}</td>
-                                <td>：<input type="text" name="{{$member.Id}}" value="{{$price}}">円</td>
+                                <td>：<input type="text" name="{{$member.Id}}" value="{{.Calculate}}">円</td>
                             </tr>
                             {{end}}
                         </table>

@@ -24,29 +24,32 @@
         <div class="new-event-page">
             <div class="new-event-title">New Expense</div>
             <div class="gray-line"></div>
-                <div>
-                    <div class="new-event-form-box">
-                        <form action="/expense/complete?event_id={{.Id}}" method="POST">
-                            <table class="form-table">
-                                <tr>
-                                    <td><labal for="name">名前</labal></td>
-                                    <td>：<input type="text" name="name" class="form-common"></td>
-                                </tr>
-                                <tr>
-                                    <td><labal for="price">合計金額</labal></td>
-                                    <td>：<input type="text" name="price" class="form-common"></td> 
-                                </tr>
-                                <tr>
-                                    <td><labal for="remarks">備考</labal></td>
-                                    <td>：<input type="text" name="remarks" class="form-common"></td>
-                                </tr>
-                            </table>
-                            <div class="expense-info">※金額は各参加者に等分されます。</div>
-                            <div class="common-submit-box">
-                                <input class="submit-common" type="submit" value="確認">
-                            </div>         
-                        </form>
+            <div>
+                <div class="new-event-form-box">
+                    <form action="/expense/confirm?event_id={{.Id}}" method="POST">
+                        <table class="form-table">
+                            <tr>
+                                <td><labal for="name">名前</labal></td>
+                                <td>：<input type="text" name="name" class="form-common"></td>
+                            </tr>
+                            <tr>
+                                <td><labal for="price">合計金額</labal></td>
+                                <td>：<input type="text" name="price" class="form-common"></td> 
+                            </tr>
+                            <tr>
+                                <td><labal for="remarks">備考</labal></td>
+                                <td>：<input type="text" name="remarks" class="form-common"></td>
+                            </tr>
+                        </table>
+                        <div class="expense-info">※金額は各参加者に等分されます。</div>
+                        <div class="common-submit-box">
+                            <input class="submit-common" type="submit" value="確認">
+                        </div>         
+                    </form>
                 </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
