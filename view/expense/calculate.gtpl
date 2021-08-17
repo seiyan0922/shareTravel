@@ -2,6 +2,12 @@
 <div class="body">
     <div class="content">
         <div class="side-bar">
+            <a href="/event/show?event_id={{.Event.Id}}" class="member-add">
+                <div class="icon-common">
+                    <div class="jet-icon"></div>
+                    <div class="add-member-text">イベントTOP</div>
+                </div>
+            </a>
             <a href="/member/add?event_id={{.Event.Id}}" class="member-add">
                 <div class="icon-common">
                     <div class="member-icon"></div>
@@ -57,7 +63,12 @@
                             {{end}}
                         </table>
                         <div class="kirisute">
+                            {{$bool := .Slash}}
+                            {{if ne $bool "false"}}
                             <input type="checkbox" name="slash" value="true" checked="checked">
+                            {{else}}
+                            <input type="checkbox" name="slash" value="true">
+                            {{end}}
                             <label for="slash">100円以下切捨て</label>
                         </div>
                         <input type="hidden" name="event" value="{{.Event.Id}}">

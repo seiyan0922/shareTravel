@@ -42,19 +42,3 @@ func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 		}
 	}
 }
-
-//入力値保存関数（代替的にtxtファイルに保存）
-/* func (p *Page) Save() error {
-	filename := p.Title + ".txt"
-	return ioutil.WriteFile("../"+filename, p.Body, 0600)
-} */
-
-//データの読み込み（大体的にテキストファイルの読み込み）
-// func LoadPage( ) (*Page, error) {
-// 	filename := title + ".txt"
-// 	body, err := ioutil.ReadFile(filename)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &Page{Title: title, Body: body}, nil
-// }

@@ -2,6 +2,12 @@
 <div class="body">
     <div class="content">
         <div class="side-bar">
+            <a href="/event/show?event_id={{.Id}}" class="member-add">
+                <div class="icon-common">
+                    <div class="jet-icon"></div>
+                    <div class="add-member-text">イベントTOP</div>
+                </div>
+            </a>
             <div class="icon-common">
                 <a href="/member/add?event_id={{.Id}}" class="member-add">
                     <div class="member-icon"></div>

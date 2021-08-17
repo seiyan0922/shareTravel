@@ -49,6 +49,15 @@ body{
 
 }
 
+.jet-icon{
+    height: 47px;
+    width:47px;
+    background-image:url("/img/event.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin:auto;
+}
+
 .member-icon{
     height: 30px;
     width:30px;

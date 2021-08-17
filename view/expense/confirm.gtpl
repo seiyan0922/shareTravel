@@ -2,6 +2,12 @@
 <div class="body">
     <div class="content">
         <div class="side-bar">
+            <a href="/event/show?event_id={{.Event.Id}}" class="member-add">
+                <div class="icon-common">
+                    <div class="jet-icon"></div>
+                    <div class="add-member-text">イベントTOP</div>
+                </div>
+            </a>
             <a href="/member/add?event_id={{.Event.Id}}" class="member-add">
                 <div class="icon-common">
                     <div class="member-icon"></div>
@@ -46,7 +52,7 @@
                     </table>
                     <div class="expense-info">※金額は各参加者に等分されます。</div>
                     <div class="expense-info"></div>
-                    <form action="/expense/complete?event_id={{.Id}}" method="POST">
+                    <form action="/expense/complete?event_id={{.Event.Id}}" method="POST">
                         <table class="form-table">
                             {{$price := .Price}}
                             {{range $member := .Members}}
@@ -66,12 +72,12 @@
 
                         <input type="hidden" name="name" value="{{.Expense.Name}}">
                         <input type="hidden" name="remarks" value="{{.Expense.Remarks}}">
-                        
+
                         <input type="hidden" name="pool" value="{{.Pool}}">
                         <input type="hidden" name="price" value="{{.Price}}">
                         <input type="hidden" name="members" value="{{.Members}}">
                         <div class="saikeisan">
-                            <button type="submit" formaction="/expense/calculate?event_id={{.Id}}">再計算</button>
+                            <button type="submit" formaction="/expense/calculate?event_id={{.Event.Id}}">再計算</button>
                             </div>
                         <div class="common-submit-box">
                             <input class="submit-common" type="submit" value="確認">

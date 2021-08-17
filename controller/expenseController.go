@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"shareTravel/common"
 	"shareTravel/form"
@@ -86,15 +85,13 @@ func calculateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	//再計算
 	new_price := total / (len(members) - count)
 
-	fmt.Println(r.FormValue("slash"))
-
 	if r.FormValue("slash") == "true" {
 		new_price = (new_price / 100) * 100
 	}
 
 	new_price_map := map[int]int{}
 
-	//新しい負担金配列を作成
+	//負担金配列を作成
 Loop:
 	for _, member := range members {
 		for member_id, change := range changed {
@@ -136,6 +133,12 @@ Loop:
 	status["Members"] = members
 	status["Pool"] = pool
 	status["Price"] = new_price
+
+	if r.FormValue("slash") == "true" {
+		status["Slash"] = "ture"
+	} else {
+		status["Slash"] = "false"
+	}
 
 	RenderTemplate(w, "view/expense/calculate", status)
 }
