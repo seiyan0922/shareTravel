@@ -56,13 +56,24 @@
                             </tr>
                             {{end}}
                         </table>
+                        <div class="kirisute">
+                            <input type="checkbox" name="slash" value="true" checked="checked">
+                            <label for="slash">100円以下切捨て</label>
+                        </div>
                         <input type="hidden" name="event" value="{{.Event.Id}}">
                         <input type="hidden" name="expense" value="{{.Expense}}">
                         <input type="hidden" name="total" value="{{.Expense.Total}}">
+                        
+                        <input type="hidden" name="name" value="{{.Expense.Name}}">
+                        <input type="hidden" name="remarks" value="{{.Expense.Remarks}}">
+
                         <input type="hidden" name="pool" value="{{.Pool}}">
                         <input type="hidden" name="price" value="{{.Price}}">
                         <input type="hidden" name="members" value="{{.Members}}">
+                        
+                        <div class="saikeisan">
                         <button type="submit" formaction="/expense/calculate?event_id={{.Id}}">再計算</button>
+                        </div>
                         <div class="common-submit-box">
                             <input class="submit-common" type="submit" value="確認">
                         </div>

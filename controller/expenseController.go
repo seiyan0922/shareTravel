@@ -48,8 +48,8 @@ func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	members := model.GetMembers(event.Id)
 	member_count := len(members)
 
-	default_price := expense.Total / member_count
-	default_pool := expense.Total % member_count
+	default_price := (expense.Total / member_count) / 100 * 100
+	default_pool := expense.Total - (default_price * len(members))
 
 	status := make(map[string]interface{})
 	status["Event"] = event
@@ -60,61 +60,6 @@ func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	status["Pool"] = default_pool
 
 	RenderTemplate(w, "view/expense/confirm", status)
-}
-
-func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
-
-	//POSTデータ：金額を取得
-	total, _ := strconv.Atoi(r.FormValue("price"))
-
-	//POSTデータ：名前を取得
-	name := r.FormValue("name")
-
-	//POSTデータ：備考を取得
-	remarks := r.FormValue("remarks")
-
-	//支払いポインタ
-	expense := new(model.Expense)
-
-	//データの格納
-	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
-
-	expense.EventId = event_id
-
-	expense.Name = name
-
-	expense.Total = total
-
-	expense.Remarks = remarks
-
-	//支払い情報を保存
-	expense.Id = expense.AddExpense()
-
-	//各参加者の負担金の登録
-	//イベントIDから参加者データを取得
-	members := model.GetMembers(event_id)
-	//参加者人数を取得
-	member_count := len(members)
-
-	//各参加者の負担金を設定
-	each_price := total / member_count
-
-	//金額が参加人数で割り切れない場合
-	if fraction := total % member_count; fraction != 0 {
-		event := new(model.Event)
-		event.Id = event_id
-		event.UpdatePool(fraction)
-	}
-
-	//イベント参加者各位の負担金額を保存する
-	err := model.CreateMemberExpense(event_id, expense, each_price)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	//テンプレートの読み込み
-	RenderTemplate(w, "view/expense/complete", expense)
-
 }
 
 func calculateExpenseHandler(w http.ResponseWriter, r *http.Request) {
@@ -141,6 +86,12 @@ func calculateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	//再計算
 	new_price := total / (len(members) - count)
 
+	fmt.Println(r.FormValue("slash"))
+
+	if r.FormValue("slash") == "true" {
+		new_price = (new_price / 100) * 100
+	}
+
 	new_price_map := map[int]int{}
 
 	//新しい負担金配列を作成
@@ -163,8 +114,6 @@ Loop:
 		}
 	}
 
-	fmt.Println(new_price_map)
-
 	status := make(map[string]interface{})
 
 	event_id, _ := strconv.Atoi(r.FormValue("event"))
@@ -179,11 +128,8 @@ Loop:
 	}
 
 	total2, _ := strconv.Atoi(r.FormValue("total"))
-	fmt.Println(total_price)
-	fmt.Println(total2)
 
 	pool := total2 - total_price
-	fmt.Println(pool)
 
 	status["Event"] = event
 	status["Expense"] = expense
@@ -192,6 +138,61 @@ Loop:
 	status["Price"] = new_price
 
 	RenderTemplate(w, "view/expense/calculate", status)
+}
+
+func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
+
+	//POSTデータ：金額を取得
+	total, _ := strconv.Atoi(r.FormValue("total"))
+
+	//POSTデータ：名前を取得
+	name := r.FormValue("name")
+
+	//POSTデータ：備考を取得
+	remarks := r.FormValue("remarks")
+
+	//支払いポインタ
+	expense := new(model.Expense)
+
+	//データの格納
+	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
+
+	expense.EventId = event_id
+
+	expense.Name = name
+
+	expense.Total = total
+
+	expense.Remarks = remarks
+
+	//支払い情報を保存(IDを戻り値として取得)
+	expense.Id = expense.AddExpense()
+
+	//各参加者の負担金の登録
+	//イベントIDから参加者データを取得
+	members := model.GetMembers(event_id)
+
+	//各参加者の負担金の保存
+	for _, member := range members {
+		member_expense := new(model.MemberExpense)
+
+		member_expense.MemberId = member.Id
+		member_expense.ExpenseId = expense.Id
+		member_expense.Price, _ = strconv.Atoi(r.FormValue(strconv.Itoa(member.Id)))
+
+	}
+
+	//金額が参加人数で割り切れない場合
+	pool, _ := strconv.Atoi(r.FormValue("Pool"))
+	if pool != 0 {
+		event := new(model.Event)
+		event.Id = event_id
+		event.UpdatePool(pool)
+	}
+
+	//テンプレートの読み込み
+	RenderTemplate(w, "view/expense/complete", expense)
+
 }
 
 //POSTデータの変換処理

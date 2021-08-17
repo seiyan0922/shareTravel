@@ -454,9 +454,17 @@ body{
     margin-top:20px;
 }
 
+.saikeisan{
+    text-align: right;
+}
+
 /* 参加者追加完了画面 */
 .addmember-to-top{
     margin:60px 0 20px 0;
+}
+
+.kirisute{
+    text-align:center;
 }
 
 /* フッター設定 */
