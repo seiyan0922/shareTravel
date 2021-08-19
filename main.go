@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"shareTravel/controller"
 )
@@ -21,5 +20,5 @@ func main() {
 	http.Handle("/layout/", http.StripPrefix("/layout/", http.FileServer(http.Dir("layout/"))))
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img/"))))
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.ListenAndServe(":8080", nil)
 }

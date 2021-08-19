@@ -22,12 +22,9 @@
                 <div class="alert-authkey">
                     ※こちらの認証IDは必ず控えて置くようにしてください。
                 </div>
-
                 <div class="back-common-box">
                     <a href="/event/show?auth_key={{.AuthKey}}" class="back-common">{{.Name}}の詳細ページへ→</a>
                 </div>
-               
-
         </div>
     </div>
 </div>

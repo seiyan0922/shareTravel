@@ -75,10 +75,16 @@ func showEventHandler(w http.ResponseWriter, r *http.Request) {
 //イベントTOP表示共通処理
 func showEventRender(w http.ResponseWriter, event *model.Event) {
 
-	expenses := event.GetExpensesByEventId()
 	status := make(map[string]interface{})
 	status["Event"] = &event
-	status["Expenses"] = &expenses
+
+	expenses := event.GetExpensesByEventId()
+	if len(expenses) == 0 {
+		status["Expenses"] = nil
+
+	} else {
+		status["Expenses"] = &expenses
+	}
 
 	RenderTemplate(w, "view/event/show", status)
 
@@ -88,17 +94,33 @@ func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
 	event := new(model.Event)
 	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
 	event.Id = event_id
-	members := model.GetMembers(event_id)
+
 	event = model.GetEvent(event)
-	showMembersEventRender(w, event, &members)
+
+	members := model.GetMembers(event_id)
+
+	nomember_flg := false
+	if len(members) == 0 {
+		nomember_flg = true
+	} else {
+		//参加メンバー負担金総額取得処理
+		GetMembersTotal(members)
+	}
+	showMembersEventRender(w, event, &members, nomember_flg)
 
 }
 
-func showMembersEventRender(w http.ResponseWriter, event *model.Event, members *[]model.Member) {
+func showMembersEventRender(w http.ResponseWriter, event *model.Event, members *[]model.Member, nomember_flg bool) {
 
 	status := make(map[string]interface{})
 	status["Event"] = event
-	status["Members"] = members
+
+	if !nomember_flg {
+		status["Members"] = members
+	} else {
+		status["Members"] = nil
+	}
+
 	RenderTemplate(w, "view/event/showMember", status)
 
 }

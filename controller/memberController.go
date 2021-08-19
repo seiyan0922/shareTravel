@@ -68,3 +68,12 @@ func postMembersCnv(str_members string) []form.Member {
 	return members
 
 }
+
+//参加メンバー負担金総額取得処理
+func GetMembersTotal(members []model.Member) []model.Member {
+	for i := 0; i < len(members); i++ {
+		model.GetMemberExpense(&members[i])
+	}
+
+	return members
+}

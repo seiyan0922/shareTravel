@@ -26,16 +26,23 @@ func ExpenseHandler(w http.ResponseWriter, r *http.Request, path string) {
 
 func addExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
+	//クエリパラメータの取得
 	event_id := common.GetQueryParam(r)
+
 	event := new(form.Event)
+
 	event.Id, _ = strconv.Atoi(event_id)
+
 	RenderTemplate(w, "view/expense/add", event)
 
 }
 
 func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
+
 	event_id := common.GetQueryParam(r)
+
 	event := new(form.Event)
+
 	event.Id, _ = strconv.Atoi(event_id)
 
 	expense := new(model.Expense)
@@ -50,6 +57,7 @@ func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	default_price := (expense.Total / member_count) / 100 * 100
 	default_pool := expense.Total - (default_price * len(members))
 
+	//値のセット
 	status := make(map[string]interface{})
 	status["Event"] = event
 	status["Expense"] = expense
@@ -62,7 +70,6 @@ func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func calculateExpenseHandler(w http.ResponseWriter, r *http.Request) {
-	// result := []int{}
 
 	//参加者一覧データ処理(文字列型で送信されたデータを構造体スライスに変換)
 	members := postMembersCnv(r.FormValue("members"))
@@ -182,6 +189,7 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 		member_expense.MemberId = member.Id
 		member_expense.ExpenseId = expense.Id
 		member_expense.Price, _ = strconv.Atoi(r.FormValue(strconv.Itoa(member.Id)))
+		member_expense.CreateMemberExpense()
 
 	}
 

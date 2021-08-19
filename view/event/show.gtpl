@@ -43,7 +43,7 @@
         </div>
         <div class="event-main">
             <div>
-                {{if ne .Expenses nil}}
+                {{if .Expenses}}
                     <table class="event-top-table">
                         <tr class="event-top-table-top">
                             <th>Name</th><th>Total</th><th>DateTime</th><th>Remarks</th><th></th>
@@ -51,10 +51,11 @@
                             {{range $expense := .Expenses}}
                                 <tr class="event-top-table-content">
                                     <td class="item-name">{{$expense.Name}}</td>
-                                    <td class="item-total">{{$expense.Total}}円</td>
+                                    <td class="item-name-total">{{$expense.Total}}円</td>
                                     <td class="item-time">{{$expense.CreateTime}}</td>
                                     <td class="item-remarks">{{$expense.Remarks}}</td>
                                     <td class="item-link">
+
                                         <a class="link" href="/expense/edit?expense_id={{$expense.Id}}">
                                             <div class="botton">編集する
                                             </div>

@@ -43,14 +43,20 @@
         </div>
         <div class="event-main">
             <div>
-                {{if ne .Members nil}}
+                {{if .Members}}
                 <table class="event-top-table">
                     <tr class="event-top-table-top">
                         <th>Name</th>
+                        <th>Total</th>
                     </tr>
                         {{range $member := .Members}}
                             <tr class="event-top-table-content">
-                                <td class="item-name">{{$member.Name}}</td>
+                                <td class="human-name">
+                                    <div class="icon-common">
+                                        <div class="human-icon"></div>{{$member.Name}}
+                                    </div>
+                                </td>
+                                <td class="item-name-total">{{$member.Total}}円</td>
                             </tr>
 
                         {{end}}

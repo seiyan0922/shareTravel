@@ -6,4 +6,5 @@ type Member struct {
 	Name    string
 
 	Calculate int
+	Total     int
 }

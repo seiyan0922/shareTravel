@@ -33,14 +33,14 @@ body{
 /* サイドバー共通 */
 .side-bar{
     float:left;
-    width:7%;
+    width:80px;
     padding-top:30px;
 }
 
 .icon-common{
     padding:20px 0;
 }
-.icon-common:hover{
+.side-bar .icon-common:hover{
     background-color: #e0dfdf; 
 }
 
@@ -48,6 +48,18 @@ body{
     text-decoration: none;
 
 }
+
+
+.human-icon{
+    height: 30px;
+    width:30px;
+    background-image:url("/img/human.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-right:10px;
+    float:left;
+}
+
 
 .jet-icon{
     height: 47px;
@@ -385,21 +397,24 @@ body{
 }
 
 .event-main{
-    background-color: #EEEEEE;
+
     min-height:500px;
     width:100%;
-    padding:50px 0;
+    padding:30px 0;
 }
 
 
 .event-top-table{
     border-collapse: collapse;
     border-spacing: 0;
-    margin:auto;
+    margin-left:100px;
 }
 
-.event-top-table tr{
-    border-bottom: solid 2px rgb(255, 255, 255);
+.event-top-table-top{
+    border-bottom: solid 1px rgb(161, 161, 161);
+    height:30px;
+}
+.event-top-table .event-top-table-content{
     height:50px;
     
 }
@@ -415,6 +430,11 @@ body{
 
 .event-top-table-content .item-name{
     min-width:100px;
+    text-align:right;
+}
+
+.event-top-table-content .item-name-total{
+    min-width:180px;
     text-align:right;
 }
 
@@ -438,7 +458,7 @@ body{
 }
 
 .event-top-table-content .item-link{
-    min-width:100px;
+    min-width:150px;
     text-align:center;
     font-size:12px;
 }
@@ -449,10 +469,18 @@ body{
 
 }
 .event-top-table-content .item-link .botton{
-    margin:0 10px;
+    margin:0 0 0 70px;
     padding:6px 0;
+    width:70px;
+    height:20px;
     border:solid 1px;
     background-color: #363636;
+}
+
+.event-top-table-content .human-name{
+    min-width:100px;
+    text-align:left;
+    font-size:20px;
 }
 
 /* 会計作成画面 */
