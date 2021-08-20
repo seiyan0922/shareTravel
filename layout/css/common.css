@@ -489,10 +489,25 @@ body{
     font-family: 'Hiragino Mincho Pro';
     font-size: 12px;
     margin-top:20px;
+
 }
 
 .saikeisan{
     text-align: right;
+}
+
+.temporarily-box{
+    text-align:center;
+    font-family: 'Hiragino Mincho Pro';
+    font-size: 16px;
+    margin-top:20px;
+    margin:auto;
+    width:350px;
+}
+
+.temporarily-labels{
+    text-align:left;
+    margin:5px 80px;
 }
 
 /* 参加者追加完了画面 */

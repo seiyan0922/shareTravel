@@ -99,6 +99,11 @@ func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	members := model.GetMembers(event_id)
 
+	//各参加者の立替金を取得
+	for i := 0; i < len(members); i++ {
+		members[i].GetMemberTemporarily()
+	}
+
 	nomember_flg := false
 	if len(members) == 0 {
 		nomember_flg = true
@@ -135,10 +140,8 @@ func searchEventHandler(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		//POSTの場合認証キーから該当のイベントを検索
 		auth_key := r.FormValue("auth_key")
-
 		event := new(model.Event)
 		event.AuthKey = auth_key
-
 		event = model.GetEvent(event)
 
 		//イベント取得に成功した場合

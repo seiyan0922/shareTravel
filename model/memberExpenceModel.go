@@ -61,3 +61,14 @@ func GetMemberExpense(member *Member) {
 
 	member.Total = totalExpense
 }
+
+func (member *Member) SearchMemberExpense(expense_id int) {
+	OpenSQL()
+
+	err := Db.QueryRow("SELECT price FROM member_expense WHERE member_id = ? AND expense_id = ?", member.Id, expense_id).
+		Scan(&member.Calculate)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+}

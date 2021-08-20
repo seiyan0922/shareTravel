@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"shareTravel/common"
 	"shareTravel/form"
@@ -11,6 +12,7 @@ import (
 
 func ExpenseHandler(w http.ResponseWriter, r *http.Request, path string) {
 	arr := strings.Split(path, "/")
+
 	switch arr[0] {
 	case "add":
 		addExpenseHandler(w, r)
@@ -20,6 +22,11 @@ func ExpenseHandler(w http.ResponseWriter, r *http.Request, path string) {
 		confirmExpenseHandler(w, r)
 	case "calculate":
 		calculateExpenseHandler(w, r)
+	case "edit":
+		editExpenseHandler(w, r)
+	case "editcalculate":
+
+		editCalculateHandler(w, r)
 
 	}
 }
@@ -28,9 +35,7 @@ func addExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 	//クエリパラメータの取得
 	event_id := common.GetQueryParam(r)
-
 	event := new(form.Event)
-
 	event.Id, _ = strconv.Atoi(event_id)
 
 	RenderTemplate(w, "view/expense/add", event)
@@ -40,9 +45,7 @@ func addExpenseHandler(w http.ResponseWriter, r *http.Request) {
 func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 	event_id := common.GetQueryParam(r)
-
 	event := new(form.Event)
-
 	event.Id, _ = strconv.Atoi(event_id)
 
 	expense := new(model.Expense)
@@ -59,12 +62,12 @@ func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 	//値のセット
 	status := make(map[string]interface{})
-	status["Event"] = event
-	status["Expense"] = expense
-	status["Members"] = members
-	status["MemberCount"] = member_count
-	status["Price"] = default_price
-	status["Pool"] = default_pool
+	status["Event"] = &event
+	status["Expense"] = &expense
+	status["Members"] = &members
+	status["MemberCount"] = &member_count
+	status["Price"] = &default_price
+	status["Pool"] = &default_pool
 
 	RenderTemplate(w, "view/expense/confirm", status)
 }
@@ -140,6 +143,7 @@ Loop:
 	status["Members"] = members
 	status["Pool"] = pool
 	status["Price"] = new_price
+	status["Temporarily"], _ = strconv.Atoi(r.FormValue("temporarily"))
 
 	if r.FormValue("slash") == "true" {
 		status["Slash"] = "ture"
@@ -148,31 +152,23 @@ Loop:
 	}
 
 	RenderTemplate(w, "view/expense/calculate", status)
+
 }
 
 func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
-	//POSTデータ：金額を取得
+	//POSTデータ
 	total, _ := strconv.Atoi(r.FormValue("total"))
-
-	//POSTデータ：名前を取得
 	name := r.FormValue("name")
-
-	//POSTデータ：備考を取得
 	remarks := r.FormValue("remarks")
 
-	//支払いポインタ
 	expense := new(model.Expense)
 
-	//データの格納
 	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
-
 	expense.EventId = event_id
-
 	expense.Name = name
-
+	expense.TemporarilyMemberId, _ = strconv.Atoi(r.FormValue("temporarily"))
 	expense.Total = total
-
 	expense.Remarks = remarks
 
 	//支払い情報を保存(IDを戻り値として取得)
@@ -185,12 +181,10 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	//各参加者の負担金の保存
 	for _, member := range members {
 		member_expense := new(model.MemberExpense)
-
 		member_expense.MemberId = member.Id
 		member_expense.ExpenseId = expense.Id
 		member_expense.Price, _ = strconv.Atoi(r.FormValue(strconv.Itoa(member.Id)))
 		member_expense.CreateMemberExpense()
-
 	}
 
 	//金額が参加人数で割り切れない場合
@@ -206,8 +200,115 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func editExpenseHandler(w http.ResponseWriter, r *http.Request) {
+
+	expense := new(model.Expense)
+	expense.Id, _ = strconv.Atoi(common.GetQueryParam(r))
+
+	expense.GetExpense()
+
+	event := new(model.Event)
+	event.Id = expense.EventId
+	event = model.GetEvent(event)
+
+	members := model.GetMembers(event.Id)
+
+	for i := 0; i < len(members); i++ {
+		members[i].SearchMemberExpense(expense.Id)
+	}
+
+	var pool int
+	var member_price_total int
+
+	for _, member := range members {
+		member_price_total += member.Calculate
+	}
+
+	pool = expense.Total - member_price_total
+
+	status := make(map[string]interface{})
+	status["Event"] = &event
+	status["Expense"] = &expense
+	status["Members"] = &members
+	status["Pool"] = &pool
+	status["Slash"] = "true"
+
+	//テンプレートの読み込み
+	RenderTemplate(w, "view/expense/edit", status)
+}
+
+func editCalculateHandler(w http.ResponseWriter, r *http.Request) {
+
+	//参加者一覧データ処理(文字列型で送信されたデータを構造体スライスに変換)
+	members := postMembersCnv(r.FormValue("members"))
+	expense := postExpenseCnv(r.FormValue("expense"))
+
+	count := 0
+	changed := map[int]int{}
+	total, _ := strconv.Atoi(r.FormValue("total"))
+
+	//変更されたメンバーを抽出
+	for i := 0; i < len(members); i++ {
+		if r.FormValue(strconv.Itoa(members[i].Id)) != r.FormValue("before"+strconv.Itoa(members[i].Id)) {
+			count++
+			price, _ := strconv.Atoi(r.FormValue(strconv.Itoa(members[i].Id)))
+			members[i].Calculate = price
+			changed[members[i].Id] = price
+			total = total - price
+		}
+	}
+
+	//再計算
+	new_price := total / (len(members) - count)
+
+	if r.FormValue("slash") == "true" {
+		new_price = (new_price / 100) * 100
+	}
+
+	//負担金配列を作成
+	for i := 0; i < len(members); i++ {
+		if r.FormValue(strconv.Itoa(members[i].Id)) == r.FormValue("before"+strconv.Itoa(members[i].Id)) {
+			members[i].Calculate = new_price
+		}
+	}
+
+	status := make(map[string]interface{})
+
+	event_id, _ := strconv.Atoi(r.FormValue("event"))
+	event := new(model.Event)
+	event.Id = event_id
+	event = model.GetEvent(event)
+
+	var total_price int
+
+	for _, member := range members {
+		total_price += member.Calculate
+	}
+
+	total2, _ := strconv.Atoi(r.FormValue("total"))
+
+	pool := total2 - total_price
+
+	status["Event"] = event
+	status["Expense"] = expense
+	status["Members"] = members
+	status["Pool"] = pool
+	status["Temporarily"], _ = strconv.Atoi(r.FormValue("temporarily"))
+
+	if r.FormValue("slash") == "true" {
+		status["Slash"] = "ture"
+	} else {
+		status["Slash"] = "false"
+	}
+
+	//テンプレートの読み込み
+	RenderTemplate(w, "view/expense/edit", status)
+
+}
+
 //POSTデータの変換処理
 func postExpenseCnv(str_expense string) form.Expense {
+	fmt.Println(str_expense)
 	replaced1 := strings.Replace(str_expense, "[", "", -1)
 	replaced2 := strings.Replace(replaced1, "]", "", -1)
 	replaced3 := strings.Replace(replaced2, "{", "", -1)
@@ -221,12 +322,14 @@ func postExpenseCnv(str_expense string) form.Expense {
 
 		expense_id, _ := strconv.Atoi(expense_arr[0])
 		event_id, _ := strconv.Atoi(expense_arr[1])
-		name := expense_arr[2]
-		total, _ := strconv.Atoi(expense_arr[3])
+		name := expense_arr[3]
+		temporarilyMemberId, _ := strconv.Atoi(expense_arr[2])
+		total, _ := strconv.Atoi(expense_arr[4])
 		remarks := expense_arr[4]
 
 		expense.Id = expense_id
 		expense.EventId = event_id
+		expense.TemporarilyMemberId = temporarilyMemberId
 		expense.Name = name
 		expense.Total = total
 		expense.Remarks = remarks
