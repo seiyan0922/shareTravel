@@ -9,7 +9,6 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/top/", controller.MakeHandler(controller.TopHandler))
 	http.HandleFunc("/view/", controller.MakeHandler(controller.ViewHandler))
-	http.HandleFunc("/edit/", controller.MakeHandler(controller.EditHandler))
 	http.HandleFunc("/create/", controller.MakeHandler(controller.CreateUserHandler))
 	http.HandleFunc("/index/", controller.MakeHandler(controller.IndexUserHandler))
 	http.HandleFunc("/event/", controller.MakeHandler(controller.EventHandler))

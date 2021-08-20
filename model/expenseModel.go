@@ -15,7 +15,7 @@ func init() {
 
 func (expense *Expense) AddExpense() int {
 
-	statement := "INSERT INTO expense (event_id,name,total,remarks,create_time) VALUES(?,?,?,?,?)"
+	statement := "INSERT INTO expense (event_id,temporarily_member,name,total,remarks,create_time) VALUES(?,?,?,?,?,?)"
 
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
@@ -24,7 +24,7 @@ func (expense *Expense) AddExpense() int {
 	t := time.Now()
 
 	defer stmt.Close()
-	stmt.Exec(expense.EventId, expense.Name, expense.Total, expense.Remarks, t)
+	stmt.Exec(expense.EventId, expense.TemporarilyMemberId, expense.Name, expense.Total, expense.Remarks, t)
 
 	if err != nil {
 		fmt.Println("Exec error")
@@ -37,6 +37,19 @@ func (expense *Expense) AddExpense() int {
 	}
 
 	return id
+}
+
+func (expense *Expense) GetExpense() {
+
+	OpenSQL()
+
+	err := Db.QueryRow("SELECT event_id,temporarily_member,total,remarks,name FROM expense WHERE id = ?", expense.Id).
+		Scan(&expense.EventId, &expense.TemporarilyMemberId, &expense.Total, &expense.Remarks, &expense.Name)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
 }
 
 func (event *Event) GetExpensesByEventId() []Expense {

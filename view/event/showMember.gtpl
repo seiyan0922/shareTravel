@@ -48,6 +48,7 @@
                     <tr class="event-top-table-top">
                         <th>Name</th>
                         <th>Total</th>
+                        <th>Temporarily</th>
                     </tr>
                         {{range $member := .Members}}
                             <tr class="event-top-table-content">
@@ -57,6 +58,7 @@
                                     </div>
                                 </td>
                                 <td class="item-name-total">{{$member.Total}}円</td>
+                                <td class="item-name-total">{{$member.Temporarily}}円</td>
                             </tr>
 
                         {{end}}

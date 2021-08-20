@@ -54,12 +54,12 @@
                     <div class="expense-info"></div>
                     <form action="/expense/complete?event_id={{.Event.Id}}" method="POST">
                         <table class="form-table">
-                            {{$price := .Price}}
+
                             {{range $member := .Members}}
                             <tr>
                                 <td>{{$member.Name}}</td>
                                 <td>：<input type="text" name="{{$member.Id}}" value="{{.Calculate}}">円</td>
-                                
+                                <input type="hidden" name="before{{$member.Id}}" value="{{.Calculate}}">
                             </tr>
                             {{end}}
                         </table>
@@ -80,16 +80,16 @@
                         <input type="hidden" name="remarks" value="{{.Expense.Remarks}}">
 
                         <input type="hidden" name="pool" value="{{.Pool}}">
-                        <input type="hidden" name="price" value="{{.Price}}">
                         <input type="hidden" name="members" value="{{.Members}}">
+                        <input type="hidden" name="edit" value="true">
                         
                         <div class="saikeisan">
-                        <button type="submit" formaction="/expense/calculate?event_id={{.Event.Id}}">再計算</button>
+                        <button type="submit" formaction="/expense/editcalculate?expense_id={{.Expense.Id}}">再計算</button>
                         </div>
                         <div class="temporarily-box">
                             <div>一時負担者（立替者）</div>
                             <div class="temporarily-labels">
-                                {{$temporarily := .Temporarily}}
+                                {{$temporarily := .Expense.TemporarilyMemberId}}
                                 {{range $member := .Members}}
                                 {{if eq $temporarily .Id}}
                                 <input type="radio" id="temporarily{{.Id}}" name="temporarily" value="{{.Id}}" checked="checked">

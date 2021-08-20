@@ -50,3 +50,27 @@ func GetMembers(id int) []Member {
 
 	return members
 }
+
+func (member *Member) GetMemberTemporarily() {
+	OpenSQL()
+
+	rows, err := Db.Query("SELECT total from expense WHERE temporarily_member = ?", member.Id)
+
+	if err != nil {
+		fmt.Println("Query Error")
+	}
+
+	var total_temporarily int
+
+	for rows.Next() {
+		var temporarily int
+		err := rows.Scan(&temporarily)
+		if err != nil {
+			fmt.Println("Scan error")
+			panic(err.Error())
+		}
+		total_temporarily += temporarily
+	}
+
+	member.Temporarily = total_temporarily
+}

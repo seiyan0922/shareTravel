@@ -78,9 +78,18 @@
                         <input type="hidden" name="members" value="{{.Members}}">
                         <div class="saikeisan">
                             <button type="submit" formaction="/expense/calculate?event_id={{.Event.Id}}">再計算</button>
+                        </div>
+                        <div class="temporarily-box">
+                            <div>一時負担者（立替者）</div>
+                            <div class="temporarily-labels">
+                                {{range $member := .Members}}
+                                <input type="radio" id="temporarily{{.Id}}" name="temporarily" value="{{.Id}}">
+                                <label for="temporarily{{.Id}}">{{.Name}}</label></br>
+                                {{end}}
                             </div>
+                        </div>
                         <div class="common-submit-box">
-                            <input class="submit-common" type="submit" value="確認">
+                            <input class="submit-common" type="submit" value="確定">
                         </div>
                     </form>
                 </div>
