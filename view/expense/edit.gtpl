@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="new-event-page">
-            <div class="new-event-title">Confirm Expense</div>
+            <div class="new-event-title">Edit Expense</div>
             <div class="gray-line"></div>
             <div>
                 <div class="new-event-form-box">
@@ -39,7 +39,7 @@
                         </tr>
                         <tr>
                             <td>合計金額</td>
-                            <td>：{{.Expense.Total}}円</td> 
+                            <td>：{{.Expense.Total}}円</td>
                         </tr>
                         <tr>
                             <td>備考</td>
@@ -52,7 +52,7 @@
                     </table>
                     <div class="expense-info">※金額は各参加者に等分されます。</div>
                     <div class="expense-info"></div>
-                    <form action="/expense/complete?event_id={{.Event.Id}}" method="POST">
+                    <form action="/expense/update?event_id={{.Event.Id}}" method="POST">
                         <table class="form-table">
 
                             {{range $member := .Members}}
@@ -75,11 +75,10 @@
                         <input type="hidden" name="event" value="{{.Event.Id}}">
                         <input type="hidden" name="expense" value="{{.Expense}}">
                         <input type="hidden" name="total" value="{{.Expense.Total}}">
-                        
+                        <input type="hidden" name="pool" value="{{.Pool}}">
+                        <input type="hidden" name="before_pool" value="{{.BeforePool}}">
                         <input type="hidden" name="name" value="{{.Expense.Name}}">
                         <input type="hidden" name="remarks" value="{{.Expense.Remarks}}">
-
-                        <input type="hidden" name="pool" value="{{.Pool}}">
                         <input type="hidden" name="members" value="{{.Members}}">
                         <input type="hidden" name="edit" value="true">
                         

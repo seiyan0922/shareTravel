@@ -25,8 +25,9 @@ func ExpenseHandler(w http.ResponseWriter, r *http.Request, path string) {
 	case "edit":
 		editExpenseHandler(w, r)
 	case "editcalculate":
-
 		editCalculateHandler(w, r)
+	case "update":
+		updateHandler(w, r)
 
 	}
 }
@@ -231,6 +232,7 @@ func editExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	status["Expense"] = &expense
 	status["Members"] = &members
 	status["Pool"] = &pool
+	status["BeforePool"] = &pool
 	status["Slash"] = "true"
 
 	//テンプレートの読み込み
@@ -293,6 +295,7 @@ func editCalculateHandler(w http.ResponseWriter, r *http.Request) {
 	status["Expense"] = expense
 	status["Members"] = members
 	status["Pool"] = pool
+	status["BeforePool"], _ = strconv.Atoi(r.FormValue("before_pool"))
 	status["Temporarily"], _ = strconv.Atoi(r.FormValue("temporarily"))
 
 	if r.FormValue("slash") == "true" {
@@ -306,8 +309,43 @@ func editCalculateHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func updateHandler(w http.ResponseWriter, r *http.Request) {
+
+	expense := postExpenseCnv(r.FormValue("expense"))
+
+	//支払い情報を保存(IDを戻り値として取得)
+	expense.UpdateExpense()
+
+	//各参加者の負担金の登録
+	//イベントIDから参加者データを取得
+	members := model.GetMembers(expense.EventId)
+
+	//各参加者の負担金の保存
+	for _, member := range members {
+		member_expense := new(model.MemberExpense)
+		member_expense.MemberId = member.Id
+		member_expense.ExpenseId = expense.Id
+		member_expense.Price, _ = strconv.Atoi(r.FormValue(strconv.Itoa(member.Id)))
+		member_expense.UpdateMemberExpense()
+	}
+
+	//金額が参加人数で割り切れない場合
+	pool, _ := strconv.Atoi(r.FormValue("Pool"))
+	before_pool, _ := strconv.Atoi(r.FormValue("BeforePool"))
+
+	if pool != 0 && before_pool != 0 {
+		event := new(model.Event)
+		event.Id, _ = strconv.Atoi(r.FormValue("event"))
+		event.EditPool(pool, before_pool)
+	}
+
+	//テンプレートの読み込み
+	RenderTemplate(w, "view/expense/update", expense)
+
+}
+
 //POSTデータの変換処理
-func postExpenseCnv(str_expense string) form.Expense {
+func postExpenseCnv(str_expense string) model.Expense {
 	fmt.Println(str_expense)
 	replaced1 := strings.Replace(str_expense, "[", "", -1)
 	replaced2 := strings.Replace(replaced1, "]", "", -1)
@@ -315,17 +353,17 @@ func postExpenseCnv(str_expense string) form.Expense {
 
 	expenses_arr := strings.Split(replaced3, "} ")
 
-	var expense form.Expense
+	var expense model.Expense
 
 	for _, str_expense := range expenses_arr {
 		expense_arr := strings.Split(str_expense, " ")
 
 		expense_id, _ := strconv.Atoi(expense_arr[0])
 		event_id, _ := strconv.Atoi(expense_arr[1])
-		name := expense_arr[3]
 		temporarilyMemberId, _ := strconv.Atoi(expense_arr[2])
+		name := expense_arr[3]
 		total, _ := strconv.Atoi(expense_arr[4])
-		remarks := expense_arr[4]
+		remarks := expense_arr[5]
 
 		expense.Id = expense_id
 		expense.EventId = event_id

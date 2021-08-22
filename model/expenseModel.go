@@ -39,6 +39,20 @@ func (expense *Expense) AddExpense() int {
 	return id
 }
 
+func (expense *Expense) UpdateExpense() {
+	OpenSQL()
+	statement := "UPDATE expense SET temporarily_member = ? ,update_time = ? WHERE id = ?"
+	stmt, err := Db.Prepare(statement)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer stmt.Close()
+	stmt.Exec(expense.TemporarilyMemberId, time.Now(), expense.Id)
+}
+
 func (expense *Expense) GetExpense() {
 
 	OpenSQL()
@@ -56,7 +70,7 @@ func (event *Event) GetExpensesByEventId() []Expense {
 
 	//DB接続
 	OpenSQL()
-	rows, err := Db.Query("SELECT id,total,name,remarks,create_time from expense WHERE event_id = ?", event.Id)
+	rows, err := Db.Query("SELECT id,total,name,remarks,temporarily_member,create_time from expense WHERE event_id = ?", event.Id)
 
 	//SQLエラー処理
 	if err != nil {
@@ -69,7 +83,7 @@ func (event *Event) GetExpensesByEventId() []Expense {
 
 	for rows.Next() {
 		expense := Expense{}
-		err := rows.Scan(&expense.Id, &expense.Total, &expense.Name, &expense.Remarks, &expense.CreateTime)
+		err := rows.Scan(&expense.Id, &expense.Total, &expense.Name, &expense.Remarks, &expense.TemporarilyMemberId, &expense.CreateTime)
 		if err != nil {
 			fmt.Println("Scan error")
 			panic(err.Error())
