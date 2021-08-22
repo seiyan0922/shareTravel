@@ -14,7 +14,7 @@
             </a>
         </div>
         <div class="icon-common">
-            <a href="" class="member-add">
+            <a href="/event/download?event_id={{.Id}}" class="member-add">
                 <div class="download-icon"></div>
                 <div class="download-text">ダウンロード</div>
             </a>

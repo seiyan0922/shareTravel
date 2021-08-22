@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"shareTravel/form"
 	"shareTravel/model"
@@ -23,6 +24,7 @@ func memberAddHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Encode()
 	strid := strings.Split(query, "=")[1]
 	event.Id, _ = strconv.Atoi(strid)
+	fmt.Println(event)
 
 	RenderTemplate(w, "view/member/add", event)
 }
