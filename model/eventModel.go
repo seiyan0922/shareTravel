@@ -39,9 +39,9 @@ func GetEvent(event *Event) *Event {
 	var err error
 
 	if event.Id != 0 {
-		err = Db.QueryRow("SELECT id,auth_key,name,date FROM event WHERE id = ?", event.Id).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date)
+		err = Db.QueryRow("SELECT id,auth_key,name,date,pool FROM event WHERE id = ?", event.Id).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date, &event.Pool)
 	} else if event.AuthKey != "" {
-		err = Db.QueryRow("SELECT id,auth_key,name,date FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date)
+		err = Db.QueryRow("SELECT id,auth_key,name,date,pool FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date, &event.Pool)
 	} else {
 		fmt.Println("it has no id and authkey")
 		return nil
@@ -89,6 +89,31 @@ func (event *Event) UpdatePool(add int) {
 
 	//SQL実行
 	stmt.Exec(pool, t, event.Id)
+}
+
+func (event *Event) EditPool(pool int, before_pool int) {
+	OpenSQL()
+
+	err := Db.QueryRow("SELECT pool FROM event WHERE id = ?", event.Id).
+		Scan(&event.Pool)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	after_pool := event.Pool - before_pool + pool
+
+	statement := "UPDATE event SET pool = ?,update_time = ? WHERE id = ?"
+	stmt, err2 := Db.Prepare(statement)
+
+	if err2 != nil {
+		fmt.Println(err2)
+		return
+	}
+
+	defer stmt.Close()
+	stmt.Exec(after_pool, time.Now(), event.Id)
 }
 
 func createAuthKey() string {

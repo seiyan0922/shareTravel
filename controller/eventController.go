@@ -27,6 +27,8 @@ func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
 		showMembersEventHandler(w, r)
 	case "edit":
 		editEventHandler(w, r)
+	case "download":
+		csvDownLoad(w, r)
 	}
 }
 
@@ -180,4 +182,59 @@ func editEventHandler(w http.ResponseWriter, r *http.Request) {
 		showEventRender(w, event)
 
 	}
+}
+
+func csvDownLoad(w http.ResponseWriter, r *http.Request) {
+
+	event := new(model.Event)
+
+	event.Id, _ = strconv.Atoi(common.GetQueryParam(r))
+
+	event = model.GetEvent(event)
+
+	members := model.GetMembers(event.Id)
+
+	expenses := event.GetExpensesByEventId()
+
+	head_line := event.Name + ",\n" + "端数合計" + strconv.Itoa(event.Pool) + "\n"
+
+	expense_lines := ","
+
+	total_expense_line := "合計（端数込み）,"
+
+	for _, expense := range expenses {
+		expense_lines += expense.Name + ","
+		total_expense_line += strconv.Itoa(expense.Total) + "円,"
+
+	}
+	expense_lines += "個人負担合計,立替,請求合計\n"
+
+	var member_lines string
+
+	for _, member := range members {
+		member_lines += member.Name + ","
+		temp := 0
+		for _, expense := range expenses {
+			member.SearchMemberExpense(expense.Id)
+			member_lines += strconv.Itoa(member.Calculate) + "円,"
+			if expense.TemporarilyMemberId == member.Id {
+				temp += expense.Total
+			}
+		}
+		model.GetMemberExpense(&member)
+		member_lines += strconv.Itoa(member.Total) + "円," + strconv.Itoa(temp) + "円," +
+			strconv.Itoa(member.Total-temp) + "円\n"
+	}
+
+	csv_string := head_line + expense_lines + member_lines + total_expense_line
+	out := []byte(csv_string)
+
+	// ファイル名
+	w.Header().Set("Content-Disposition", "attachment; filename=result.csv")
+	// コンテントタイプ
+	w.Header().Set("Content-Type", "text/csv")
+	// ファイルの長さ
+	w.Header().Set("Content-Length", string(len(out)))
+	// bodyに書き込み
+	w.Write(out)
 }

@@ -35,6 +35,32 @@ func (member_expense *MemberExpense) CreateMemberExpense() {
 	}
 }
 
+func GetMemberExpensesAll(member_id int) []MemberExpense {
+	//DB接続
+	OpenSQL()
+
+	//クエリ実行
+	rows, err := Db.Query("SELECT expense_id, price from member_expense WHERE member_id = ?", member_id)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	member_expenses := []MemberExpense{}
+
+	for rows.Next() {
+		var member_expense MemberExpense
+		err := rows.Scan(&member_expense.ExpenseId, &member_expense.Price)
+		if err != nil {
+			fmt.Println("Scan error")
+			panic(err.Error())
+		}
+		member_expenses = append(member_expenses, member_expense)
+	}
+
+	return member_expenses
+}
+
 func GetMemberExpense(member *Member) {
 
 	//DB接続
@@ -69,6 +95,19 @@ func (member *Member) SearchMemberExpense(expense_id int) {
 		Scan(&member.Calculate)
 
 	if err != nil {
+		member.Calculate = 0
+	}
+}
+
+func (member_expense *MemberExpense) UpdateMemberExpense() {
+	OpenSQL()
+	statement := "UPDATE member_expense SET price = ? , update_time = ? WHERE member_id = ? AND expense_id  = ?"
+	stmt, err := Db.Prepare(statement)
+
+	if err != nil {
 		fmt.Println(err)
 	}
+
+	defer stmt.Close()
+	stmt.Exec(member_expense.Price, time.Now(), member_expense.MemberId, member_expense.ExpenseId)
 }
