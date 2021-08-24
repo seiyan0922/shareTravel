@@ -12,6 +12,7 @@ var users []User
 
 func (user *User) CreateUser() error {
 	OpenSQL()
+	defer Db.Close()
 	statement := "insert into users (name,age,address,create_time) values(?,?,?,?)"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
@@ -33,6 +34,7 @@ func (user *User) CreateUser() error {
 
 func IndexUser() []User {
 	OpenSQL()
+	defer Db.Close()
 
 	rows, err := Db.Query("SELECT id,name,age,address FROM users")
 	if err != nil {
