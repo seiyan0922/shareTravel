@@ -12,6 +12,7 @@ type Event form.Event
 
 func (event *Event) CreateEvent() string {
 	OpenSQL()
+	defer Db.Close()
 	//認証キーの取得
 	key := createAuthKey()
 	statement := "insert into event (auth_key,name,date,create_time) values(?,?,?,?)"
@@ -35,6 +36,7 @@ func (event *Event) CreateEvent() string {
 
 func GetEvent(event *Event) *Event {
 	OpenSQL()
+	defer Db.Close()
 
 	var err error
 
@@ -61,6 +63,7 @@ func (event *Event) UpdatePool(add int) {
 	var pool int
 
 	OpenSQL()
+	defer Db.Close()
 	//現在の端数プールを取得
 	err := Db.QueryRow("SELECT pool FROM event WHERE id = ?", event.Id).Scan(&pool)
 
@@ -93,6 +96,7 @@ func (event *Event) UpdatePool(add int) {
 
 func (event *Event) EditPool(pool int, before_pool int) {
 	OpenSQL()
+	defer Db.Close()
 
 	err := Db.QueryRow("SELECT pool FROM event WHERE id = ?", event.Id).
 		Scan(&event.Pool)
@@ -128,6 +132,7 @@ func createAuthKey() string {
 
 func (event *Event) UpdateEvent() {
 	OpenSQL()
+	defer Db.Close()
 	fmt.Println(event)
 
 	statement := "UPDATE event SET auth_key = ? ,name = ?,date = ? WHERE id = ? "
