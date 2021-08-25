@@ -3,13 +3,17 @@ package main
 import (
 	"net/http"
 	"shareTravel/controller"
+	"shareTravel/model"
 )
 
 func main() {
+
+	//サーバー起動時にDBコネクションの起動
+	model.OpenSQL()
+	defer model.Db.Close()
+
 	http.HandleFunc("/", controller.MakeHandler(controller.TopHandler))
 	http.HandleFunc("/view/", controller.MakeHandler(controller.ViewHandler))
-	http.HandleFunc("/create/", controller.MakeHandler(controller.CreateUserHandler))
-	http.HandleFunc("/index/", controller.MakeHandler(controller.IndexUserHandler))
 	http.HandleFunc("/event/", controller.MakeHandler(controller.EventHandler))
 	http.HandleFunc("/member/", controller.MakeHandler(controller.MemberHandler))
 	http.HandleFunc("/expense/", controller.MakeHandler(controller.ExpenseHandler))

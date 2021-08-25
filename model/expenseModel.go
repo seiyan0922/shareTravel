@@ -3,16 +3,20 @@ package model
 import (
 	"fmt"
 	"shareTravel/common"
-	"shareTravel/form"
 	"time"
 )
 
-type Expense form.Expense
+type Expense struct {
+	Id                  int
+	EventId             int
+	TemporarilyMemberId int
+	Name                string
+	Total               int
+	Remarks             string
+	CreateTime          string
+}
 
 func (expense *Expense) AddExpense() int {
-
-	OpenSQL()
-	defer Db.Close()
 
 	statement := "INSERT INTO expense (event_id,temporarily_member,name,total,remarks,create_time) VALUES(?,?,?,?,?,?)"
 
@@ -39,8 +43,6 @@ func (expense *Expense) AddExpense() int {
 }
 
 func (expense *Expense) UpdateExpense() {
-	OpenSQL()
-	defer Db.Close()
 
 	statement := "UPDATE expense SET temporarily_member = ? ,update_time = ? WHERE id = ?"
 	stmt, err := Db.Prepare(statement)
@@ -56,9 +58,6 @@ func (expense *Expense) UpdateExpense() {
 
 func (expense *Expense) GetExpense() {
 
-	OpenSQL()
-	defer Db.Close()
-
 	err := Db.QueryRow("SELECT event_id,temporarily_member,total,remarks,name FROM expense WHERE id = ?", expense.Id).
 		Scan(&expense.EventId, &expense.TemporarilyMemberId, &expense.Total, &expense.Remarks, &expense.Name)
 
@@ -69,10 +68,6 @@ func (expense *Expense) GetExpense() {
 }
 
 func (event *Event) GetExpensesByEventId() []Expense {
-
-	//DB接続
-	OpenSQL()
-	defer Db.Close()
 
 	rows, err := Db.Query("SELECT id,total,name,remarks,temporarily_member,create_time from expense WHERE event_id = ?", event.Id)
 

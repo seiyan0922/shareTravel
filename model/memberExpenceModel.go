@@ -2,17 +2,18 @@ package model
 
 import (
 	"fmt"
-	"shareTravel/form"
 	"time"
 )
 
-type MemberExpense form.MemberExpense
+type MemberExpense struct {
+	Id         int
+	MemberId   int
+	ExpenseId  int
+	Price      int
+	CreateTime string
+}
 
 func (member_expense *MemberExpense) CreateMemberExpense() {
-
-	//DB接続
-	OpenSQL()
-	defer Db.Close()
 
 	t := time.Now()
 
@@ -37,9 +38,6 @@ func (member_expense *MemberExpense) CreateMemberExpense() {
 }
 
 func GetMemberExpensesAll(member_id int) []MemberExpense {
-	//DB接続
-	OpenSQL()
-	defer Db.Close()
 
 	//クエリ実行
 	rows, err := Db.Query("SELECT expense_id, price from member_expense WHERE member_id = ?", member_id)
@@ -65,10 +63,6 @@ func GetMemberExpensesAll(member_id int) []MemberExpense {
 
 func GetMemberExpense(member *Member) {
 
-	//DB接続
-	OpenSQL()
-	defer Db.Close()
-
 	//クエリ実行
 	rows, err := Db.Query("SELECT price from member_expense WHERE member_id = ?", member.Id)
 
@@ -92,8 +86,6 @@ func GetMemberExpense(member *Member) {
 }
 
 func (member *Member) SearchMemberExpense(expense_id int) {
-	OpenSQL()
-	defer Db.Close()
 
 	err := Db.QueryRow("SELECT price FROM member_expense WHERE member_id = ? AND expense_id = ?", member.Id, expense_id).
 		Scan(&member.Calculate)
@@ -104,8 +96,7 @@ func (member *Member) SearchMemberExpense(expense_id int) {
 }
 
 func (member_expense *MemberExpense) UpdateMemberExpense() {
-	OpenSQL()
-	defer Db.Close()
+
 	statement := "UPDATE member_expense SET price = ? , update_time = ? WHERE member_id = ? AND expense_id  = ?"
 	stmt, err := Db.Prepare(statement)
 

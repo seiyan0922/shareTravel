@@ -4,15 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"shareTravel/common"
-	"shareTravel/form"
 	"shareTravel/model"
 	"strconv"
 	"strings"
 )
 
 func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
-	arr := strings.Split(path, "/")
-	switch arr[0] {
+	arr := strings.Split(path, common.SLASH)
+	switch arr[common.ZERO] {
 	case "create":
 		createEventHandler(w, r)
 	case "confirm":
@@ -37,7 +36,7 @@ func createEventHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func confirmEventHandler(w http.ResponseWriter, r *http.Request) {
-	event := new(form.Event)
+	event := new(model.Event)
 	event.Name = r.FormValue("name")
 	event.Date = r.FormValue("datetime")
 
@@ -49,7 +48,6 @@ func saveEventHandler(w http.ResponseWriter, r *http.Request) {
 	event := new(model.Event)
 	event.Name = r.FormValue("name")
 	event.Date = r.FormValue("date")
-	fmt.Println(r.FormValue("name"))
 	key := event.CreateEvent()
 	event.AuthKey = key
 	RenderTemplate(w, "view/event/complete", event)

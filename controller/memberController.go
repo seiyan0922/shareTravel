@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
-	"shareTravel/form"
 	"shareTravel/model"
 	"strconv"
 	"strings"
@@ -20,11 +18,10 @@ func MemberHandler(w http.ResponseWriter, r *http.Request, path string) {
 }
 
 func memberAddHandler(w http.ResponseWriter, r *http.Request) {
-	event := new(form.Event)
+	event := new(model.Event)
 	query := r.URL.Query().Encode()
 	strid := strings.Split(query, "=")[1]
 	event.Id, _ = strconv.Atoi(strid)
-	fmt.Println(event)
 
 	RenderTemplate(w, "view/member/add", event)
 }
@@ -42,7 +39,7 @@ func memberSaveHandler(w http.ResponseWriter, r *http.Request) {
 	RenderTemplate(w, "view/member/complete", member)
 }
 
-func postMembersCnv(str_members string) []form.Member {
+func postMembersCnv(str_members string) []model.Member {
 
 	replaced1 := strings.Replace(str_members, "[", "", -1)
 	replaced2 := strings.Replace(replaced1, "]", "", -1)
@@ -50,7 +47,7 @@ func postMembersCnv(str_members string) []form.Member {
 
 	members_arr := strings.Split(replaced3, "} ")
 
-	var members []form.Member
+	var members []model.Member
 
 	for _, str_member := range members_arr {
 		member_arr := strings.Split(str_member, " ")
@@ -59,7 +56,7 @@ func postMembersCnv(str_members string) []form.Member {
 		event_id, _ := strconv.Atoi(member_arr[1])
 		name := member_arr[2]
 
-		var member form.Member
+		var member model.Member
 		member.Id = member_id
 		member.EventId = event_id
 		member.Name = name
