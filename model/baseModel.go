@@ -2,8 +2,9 @@ package model
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 	"shareTravel/common"
-	"shareTravel/env"
 	"strconv"
 	"time"
 
@@ -13,34 +14,35 @@ import (
 var Db *sql.DB
 
 //DBへの接続
-func OpenSQL() {
+func Connect() {
 	var err error
-	sql_name := env.SQL
-	connection :=
-		env.USER +
-			":" + env.PASS +
-			"@" + env.PROTOCOL +
-			"(" + env.HOST + ":" +
-			env.PORT +
-			common.SLASH +
-			env.DB +
-			"?" +
-			env.OPTION
+	driver := os.Getenv("Driver")
+	user := os.Getenv("User")
+	pass := os.Getenv("Pass")
+	host := os.Getenv("Host")
+	port := os.Getenv("Port")
+	database := os.Getenv("DataBase")
 
-	Db, err = sql.Open(sql_name, connection)
+	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", user, pass, host, port, database)
+
+	Db, err = sql.Open(driver, connection)
 	if err != nil {
 		panic(err)
 	}
+
 }
 
 //重複チェック
 func DuplicateCheck(table string, item string, value interface{}) bool {
-	err := Db.QueryRow("SELECT id FROM ? WHERE ? = ?", table, item, value)
+	var id int
+	query := fmt.Sprintf("SELECT id FROM %s WHERE %s = ?", table, item)
+	err := Db.QueryRow(query, value).Scan(&id)
 
 	if err == nil {
-		return true
-	} else {
 		return false
+	} else {
+		fmt.Println(err)
+		return true
 	}
 }
 
@@ -71,7 +73,7 @@ func insert(table string, values map[string]interface{}) error {
 				value_query += "'" + value + "',"
 			case time.Time:
 				val_str := value.Format(common.TIME_LAYOUT)
-				value_query += val_str + ","
+				value_query += "'" + val_str + "',"
 			}
 		} else {
 			column_query += column
@@ -83,7 +85,7 @@ func insert(table string, values map[string]interface{}) error {
 				value_query += "'" + value + "'"
 			case time.Time:
 				val_str := value.Format(common.TIME_LAYOUT)
-				value_query += val_str
+				value_query += "'" + val_str + "'"
 			}
 			break
 		}
@@ -103,6 +105,7 @@ func insert(table string, values map[string]interface{}) error {
 	defer stmt.Close()
 
 	stmt.Exec()
+
 	return nil
 }
 

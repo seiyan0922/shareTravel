@@ -2,18 +2,21 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"shareTravel/controller"
-	"shareTravel/model"
 )
 
 func main() {
-
-	//サーバー起動時にDBコネクションの起動
-	model.OpenSQL()
-	defer model.Db.Close()
+	//環境変数の設定
+	//DB設定
+	os.Setenv("Driver", "mysql")
+	os.Setenv("User", "root")
+	os.Setenv("Pass", "")
+	os.Setenv("Host", "127.0.0.1")
+	os.Setenv("Port", "3306")
+	os.Setenv("DataBase", "share_travel")
 
 	http.HandleFunc("/", controller.MakeHandler(controller.TopHandler))
-	http.HandleFunc("/view/", controller.MakeHandler(controller.ViewHandler))
 	http.HandleFunc("/event/", controller.MakeHandler(controller.EventHandler))
 	http.HandleFunc("/member/", controller.MakeHandler(controller.MemberHandler))
 	http.HandleFunc("/expense/", controller.MakeHandler(controller.ExpenseHandler))

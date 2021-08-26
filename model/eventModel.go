@@ -1,8 +1,8 @@
 package model
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
 	"shareTravel/common"
 	"time"
 )
@@ -11,8 +11,8 @@ type Event struct {
 	Id         int
 	AuthKey    string
 	Pool       int
-	Name       string
-	Date       string
+	Name       string `validate:"required"`
+	Date       string `validate:"required"`
 	CreateTime time.Time
 	UpdateTime time.Time
 }
@@ -23,13 +23,24 @@ var event_columns = [7]string{"id", "auth_key", "pool", "name", "date", "create_
 
 //イベント情報登録関数
 func (event *Event) CreateEvent() string {
+
 	//認証キー(ランダム文字列)の取得
-	key := createAuthKey()
+	//key, err := createAuthKey()
+	key := "0fQasfadsfas"
+	var err error
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
 
 	//認証キーの重複チェック
 	for {
-		if DuplicateCheck(event_table, "auth_key", key) {
-			key = createAuthKey()
+		if !DuplicateCheck(event_table, "auth_key", key) {
+			key, err = createAuthKey()
+			if err != nil {
+				fmt.Println(err)
+				return ""
+			}
 			continue
 		}
 		break
@@ -46,7 +57,7 @@ func (event *Event) CreateEvent() string {
 	data := event.EventAutoMapperForModel()
 
 	//DB登録
-	err := insert(event_table, data)
+	err = insert(event_table, data)
 
 	if err != nil {
 		fmt.Println(err)
@@ -65,33 +76,31 @@ func (event *Event) EventAutoMapperForModel() map[string]interface{} {
 
 	//各プロパティに対して値がセットされている場合、カラム名に紐づけてマッピング
 	if event.Id != 0 {
-
 		data[event_columns[0]] = event.Id
+	}
 
-	} else if event.AuthKey != "" {
-
+	if event.AuthKey != "" {
 		data[event_columns[1]] = event.AuthKey
+	}
 
-	} else if event.Pool != 0 {
-
+	if event.Pool != 0 {
 		data[event_columns[2]] = event.Pool
+	}
 
-	} else if event.Name != "" {
-
+	if event.Name != "" {
 		data[event_columns[3]] = event.Name
+	}
 
-	} else if event.Date != "" {
-
+	if event.Date != "" {
 		data[event_columns[4]] = event.Date
+	}
 
-	} else if event.CreateTime.IsZero() {
-
+	if !event.CreateTime.IsZero() {
 		data[event_columns[5]] = event.CreateTime
+	}
 
-	} else if event.UpdateTime.IsZero() {
-
+	if !event.UpdateTime.IsZero() {
 		data[event_columns[6]] = event.UpdateTime
-
 	}
 
 	//マッピングデータを返却
@@ -100,18 +109,25 @@ func (event *Event) EventAutoMapperForModel() map[string]interface{} {
 }
 
 //認証ID生成用関数
-func createAuthKey() string {
-	var rs1Letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+func createAuthKey() (string, error) {
 
-	key := make([]rune, 16)
-	for i := range key {
-		key[i] = rs1Letters[rand.Intn(len(rs1Letters))]
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
 	}
-	return string(key)
+
+	var result string
+	for _, v := range b {
+		result += string(letters[int(v)%len(letters)])
+	}
+	return result, nil
 }
 
+//
 //リファクタリング未済
-
+//
 func GetEvent(event *Event) *Event {
 
 	var err error
