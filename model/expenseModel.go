@@ -22,7 +22,7 @@ func (expense *Expense) AddExpense() int {
 
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
-		fmt.Println("Prepare error")
+		fmt.Println(err)
 	}
 	t := time.Now()
 
@@ -30,7 +30,7 @@ func (expense *Expense) AddExpense() int {
 	stmt.Exec(expense.EventId, expense.TemporarilyMemberId, expense.Name, expense.Total, expense.Remarks, t)
 
 	if err != nil {
-		fmt.Println("Exec error")
+		fmt.Println(err)
 	}
 	var id int
 	err2 := Db.QueryRow("SELECT LAST_INSERT_ID()").Scan(&id)
@@ -73,7 +73,7 @@ func (event *Event) GetExpensesByEventId() []Expense {
 
 	//SQLエラー処理
 	if err != nil {
-		fmt.Println("Query Error")
+		fmt.Println(err)
 		return nil
 	}
 
@@ -84,7 +84,7 @@ func (event *Event) GetExpensesByEventId() []Expense {
 		expense := Expense{}
 		err := rows.Scan(&expense.Id, &expense.Total, &expense.Name, &expense.Remarks, &expense.TemporarilyMemberId, &expense.CreateTime)
 		if err != nil {
-			fmt.Println("Scan error")
+			fmt.Println(err)
 			panic(err.Error())
 		}
 		expense.CreateTime = common.TimeFormatter(expense.CreateTime)

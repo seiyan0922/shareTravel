@@ -9,17 +9,17 @@
             <table class="form-table">
                 <tr>
                     <td>イベント名</td>
-                    <td>：{{.Name}}</td>
+                    <td>：{{.Event.Name}}</td>
                 </tr>
                 <tr>
                     <td>日付</td>
-                    <td>：{{.Date}}</td>
+                    <td>：{{.Event.Date}}</td>
                 </tr>
             </table>
  
             <form action="/event/save" method="POST">
-                <input type="hidden" value={{.Date}} name="date">
-                <input type="hidden" value={{.Name}} name="name">
+                <input type="hidden" value={{.Event.Date}} name="date">
+                <input type="hidden" value={{.Event.Name}} name="name">
                 <div class="common-submit-box">
                     <input class="submit-common" type="submit" value="登録">
                 </div>  

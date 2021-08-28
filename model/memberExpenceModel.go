@@ -33,7 +33,7 @@ func (member_expense *MemberExpense) CreateMemberExpense() {
 	defer stmt.Close()
 
 	if err2 != nil {
-		fmt.Println("Exec error")
+		fmt.Println(err)
 	}
 }
 
@@ -52,7 +52,7 @@ func GetMemberExpensesAll(member_id int) []MemberExpense {
 		var member_expense MemberExpense
 		err := rows.Scan(&member_expense.ExpenseId, &member_expense.Price)
 		if err != nil {
-			fmt.Println("Scan error")
+			fmt.Println(err)
 			panic(err.Error())
 		}
 		member_expenses = append(member_expenses, member_expense)
@@ -76,7 +76,7 @@ func GetMemberExpense(member *Member) {
 		var expense int
 		err := rows.Scan(&expense)
 		if err != nil {
-			fmt.Println("Scan error")
+			fmt.Println(err)
 			panic(err.Error())
 		}
 		totalExpense += expense

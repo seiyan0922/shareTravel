@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"shareTravel/common"
 	"shareTravel/model"
@@ -11,6 +10,8 @@ import (
 )
 
 func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
+
+	//pathによって実行する関数を分岐
 	arr := strings.Split(path, common.SLASH)
 	switch arr[common.ZERO] {
 	case CREATE:
@@ -34,7 +35,7 @@ func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
 
 //新規イベント作成画面表示
 func createEventHandler(w http.ResponseWriter, r *http.Request) {
-	RenderTemplate(w, "view/event/create", nil)
+	RenderTemplate(w, EVENT_CREATE_PATH, nil)
 }
 
 //新規イベント確認画面表示
@@ -45,16 +46,42 @@ func confirmEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	//バリデーションチェック
 	if ok, errs := validate.EventValidater(event); !ok {
-		errorHandler(w, "view/event/create", nil, errs)
+		//バリデーションエラーがあった場合
+		errorHandler(w, EVENT_CREATE_PATH, nil, errs)
 	}
 
-	RenderTemplate(w, "view/event/confirm", event)
+	//クライアントへの連携値を整形
+	status := autoMapperForView(event)
+
+	RenderTemplate(w, EVENT_CONFIRM_PATH, status)
+}
+
+//新規イベント作成完了画面表示
+func saveEventHandler(w http.ResponseWriter, r *http.Request) {
+
+	//入力値を構造体に変換
+	event, _ := formValueEncodeForEvent(r)
+
+	if ok, errs := validate.EventValidater(event); !ok {
+		//バリデーションエラーがあった場合
+		errorHandler(w, EVENT_CREATE_PATH, nil, errs)
+	}
+
+	//DB登録処理
+	event = event.CreateEvent()
+
+	//クライアントへの連携値を整形
+	status := autoMapperForView(event)
+
+	RenderTemplate(w, EVENT_COMPLETE_PATH, status)
+
 }
 
 //リクエストをもとに入力値をイベント用構造体に変換
 func formValueEncodeForEvent(r *http.Request) (*model.Event, error) {
 	event := new(model.Event)
 
+	//POST値が存在するかの判別
 	if name := r.FormValue("name"); name != EMPTY {
 		event.Name = name
 	}
@@ -63,7 +90,7 @@ func formValueEncodeForEvent(r *http.Request) (*model.Event, error) {
 		event.Pool, _ = strconv.Atoi(pool)
 	}
 
-	if datetime := r.FormValue("datetime"); datetime != EMPTY {
+	if datetime := r.FormValue("date"); datetime != EMPTY {
 		event.Date = datetime
 	}
 
@@ -71,62 +98,59 @@ func formValueEncodeForEvent(r *http.Request) (*model.Event, error) {
 
 }
 
-//リファクタリング未済
-
-//新規イベント作成完了画面表示
-func saveEventHandler(w http.ResponseWriter, r *http.Request) {
-
-	event := new(model.Event)
-	event.Name = r.FormValue("name")
-	event.Date = r.FormValue("date")
-	key := event.CreateEvent()
-	event.AuthKey = key
-	RenderTemplate(w, "view/event/complete", event)
-
-}
-
+//イベントTOP表示ハンドラー
 func showEventHandler(w http.ResponseWriter, r *http.Request) {
 
+	//構造体ポインタの作成
 	event := new(model.Event)
-	query := r.URL.Query().Encode()
-	qarr := strings.Split(query, "=")
 
-	if qarr[0] == "event_id" {
-		event.Id, _ = strconv.Atoi(qarr[1])
-	} else {
-		event.AuthKey = qarr[1]
-	}
+	//クエリパラメータの取得
+	id_str := common.GetQueryParam(r)
 
-	event = model.GetEvent(event)
+	//クエリパラメータを整数型に変換
+	event.Id, _ = strconv.Atoi(id_str)
 
+	//イベントIDに紐づくイベントを取得
+	event.GetEvent()
+
+	//イベントTOP画面をレンダリング
 	showEventRender(w, event)
 
 }
 
-//イベントTOP表示共通処理
+//イベントTOP画面レンダー
 func showEventRender(w http.ResponseWriter, event *model.Event) {
 
-	status := make(map[string]interface{})
-	status["Event"] = &event
-
 	expenses := event.GetExpensesByEventId()
-	if len(expenses) == 0 {
-		status["Expenses"] = nil
 
-	} else {
-		status["Expenses"] = &expenses
-	}
+	status := autoMapperForView(event, expenses)
 
 	RenderTemplate(w, "view/event/show", status)
 
 }
+
+//
+//
+//
+//
+//
+//
+//
+//リファクタリング未済
+//
+//
+//
+//
+//
+//
+//
 
 func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
 	event := new(model.Event)
 	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
 	event.Id = event_id
 
-	event = model.GetEvent(event)
+	event.GetEvent()
 
 	members := model.GetMembers(event_id)
 
@@ -173,7 +197,7 @@ func searchEventHandler(w http.ResponseWriter, r *http.Request) {
 		auth_key := r.FormValue("auth_key")
 		event := new(model.Event)
 		event.AuthKey = auth_key
-		event = model.GetEvent(event)
+		event.GetEvent()
 
 		//イベント取得に成功した場合
 		if event != nil {
@@ -196,7 +220,7 @@ func editEventHandler(w http.ResponseWriter, r *http.Request) {
 	//リクエストメソッドによる条件分岐
 	switch r.Method {
 	case "GET":
-		event = model.GetEvent(event)
+		event.GetEvent()
 
 		//イベント編集テンプレートの読み込み
 		RenderTemplate(w, "view/event/edit", event)
@@ -205,7 +229,7 @@ func editEventHandler(w http.ResponseWriter, r *http.Request) {
 		event.AuthKey = r.FormValue("auth_key")
 		event.Name = r.FormValue("name")
 		event.Date = r.FormValue("date")
-		fmt.Println(r.FormValue("date"))
+
 		event.UpdateEvent()
 
 		showEventRender(w, event)
@@ -219,7 +243,7 @@ func csvDownLoad(w http.ResponseWriter, r *http.Request) {
 
 	event.Id, _ = strconv.Atoi(common.GetQueryParam(r))
 
-	event = model.GetEvent(event)
+	event.GetEvent()
 
 	members := model.GetMembers(event.Id)
 

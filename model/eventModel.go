@@ -19,18 +19,17 @@ type Event struct {
 
 var event_table = "event"
 
-var event_columns = [7]string{"id", "auth_key", "pool", "name", "date", "create_time", "update_time"}
+var event_columns = []string{"id", "auth_key", "pool", "name", "date", "create_time", "update_time"}
 
 //イベント情報登録関数
-func (event *Event) CreateEvent() string {
+func (event *Event) CreateEvent() *Event {
 
 	//認証キー(ランダム文字列)の取得
 	//key, err := createAuthKey()
-	key := "0fQasfadsfas"
-	var err error
+	key, err := createAuthKey()
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return nil
 	}
 
 	//認証キーの重複チェック
@@ -39,7 +38,7 @@ func (event *Event) CreateEvent() string {
 			key, err = createAuthKey()
 			if err != nil {
 				fmt.Println(err)
-				return ""
+				return nil
 			}
 			continue
 		}
@@ -61,14 +60,34 @@ func (event *Event) CreateEvent() string {
 
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return nil
 	}
 
+	event.AuthKey = key
+
+	event.GetEvent()
+
 	//認証IDを返却
-	return key
+	return event
 }
 
-//クエリ作成用マップのオートマッピング関数
+func (event *Event) GetEvent() {
+
+	//データ検索用のマップを生成
+	data := event.EventAutoMapperForModel()
+
+	//データ検索を実行、スキャン
+	err := find(event_table, event_columns, data).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date, &event.Pool)
+
+	if err != nil {
+		return
+	}
+
+	//イベント日時をYYYY/MM/DDに変換
+	event.Date = common.TimeFormatterHyphen(event.Date)
+
+}
+
 func (event *Event) EventAutoMapperForModel() map[string]interface{} {
 
 	//マップデータの初期化
@@ -128,27 +147,6 @@ func createAuthKey() (string, error) {
 //
 //リファクタリング未済
 //
-func GetEvent(event *Event) *Event {
-
-	var err error
-
-	if event.Id != 0 {
-		err = Db.QueryRow("SELECT id,auth_key,name,date,pool FROM event WHERE id = ?", event.Id).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date, &event.Pool)
-	} else if event.AuthKey != "" {
-		err = Db.QueryRow("SELECT id,auth_key,name,date,pool FROM event WHERE auth_key = ?", event.AuthKey).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date, &event.Pool)
-	} else {
-		fmt.Println("it has no id and authkey")
-		return nil
-	}
-
-	if err != nil {
-		return nil
-	}
-
-	event.Date = common.TimeFormatterHyphen(event.Date)
-
-	return event
-}
 
 func (event *Event) UpdatePool(add int) {
 
@@ -159,7 +157,7 @@ func (event *Event) UpdatePool(add int) {
 
 	if err != nil {
 		//変数書き換えに失敗した場合終了
-		fmt.Println("Exec error in SELECT")
+		fmt.Println(err)
 		return
 	}
 
@@ -167,7 +165,7 @@ func (event *Event) UpdatePool(add int) {
 	statement := "UPDATE event SET pool = ?,update_time = ? WHERE id = ?;"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
-		fmt.Println("Prepare error")
+		fmt.Println(err)
 		return
 	}
 

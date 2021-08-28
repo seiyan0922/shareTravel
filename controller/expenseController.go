@@ -1,13 +1,14 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"shareTravel/common"
 	"shareTravel/model"
 	"strconv"
 	"strings"
 )
+
+//リファクタリング未済
 
 func ExpenseHandler(w http.ResponseWriter, r *http.Request, path string) {
 	arr := strings.Split(path, "/")
@@ -47,6 +48,16 @@ func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	event_id := common.GetQueryParam(r)
 	event := new(model.Event)
 	event.Id, _ = strconv.Atoi(event_id)
+
+	if model.GetMembers(event.Id) == nil {
+
+		errs := map[string]string{}
+		errs["Members1"] = `参加者がいない場合会計の登録はできません。`
+		errs["Members2"] = `先に参加者の登録をしてください。`
+		status := autoMapperForView(event)
+		errorHandler(w, "view/expense/add", status, errs)
+		return
+	}
 
 	expense := new(model.Expense)
 	expense.EventId = event.Id
@@ -126,7 +137,7 @@ Loop:
 	event_id, _ := strconv.Atoi(r.FormValue("event"))
 	event := new(model.Event)
 	event.Id = event_id
-	event = model.GetEvent(event)
+	event.GetEvent()
 
 	var total_price int
 
@@ -209,7 +220,7 @@ func editExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 	event := new(model.Event)
 	event.Id = expense.EventId
-	event = model.GetEvent(event)
+	event.GetEvent()
 
 	members := model.GetMembers(event.Id)
 
@@ -278,7 +289,7 @@ func editCalculateHandler(w http.ResponseWriter, r *http.Request) {
 	event_id, _ := strconv.Atoi(r.FormValue("event"))
 	event := new(model.Event)
 	event.Id = event_id
-	event = model.GetEvent(event)
+	event.GetEvent()
 
 	var total_price int
 
@@ -345,7 +356,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 //POSTデータの変換処理
 func postExpenseCnv(str_expense string) model.Expense {
-	fmt.Println(str_expense)
+
 	replaced1 := strings.Replace(str_expense, "[", "", -1)
 	replaced2 := strings.Replace(replaced1, "]", "", -1)
 	replaced3 := strings.Replace(replaced2, "{", "", -1)

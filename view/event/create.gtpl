@@ -17,7 +17,7 @@
                             </tr>
                             <tr>
                                 <td><label for=date>開催日</label></td>
-                                <td>：<input type="date" name="datetime" class="form-common"><td>
+                                <td>：<input type="date" name="date" class="form-common"><td>
                             </tr>
                             
 

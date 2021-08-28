@@ -28,6 +28,9 @@
             </div>
         </div>
         <div class="new-event-page">
+            {{range $err := .Errors}}
+            <div class="error" style="color:red">{{$err}}</div>
+            {{end}}
             <div class="new-event-title">New Expense</div>
             <div class="gray-line"></div>
             <div>

@@ -5,12 +5,14 @@ import (
 	"strings"
 )
 
+//クエリパラメータの取得処理
 func GetQueryParam(r *http.Request) string {
 	query := r.URL.Query().Encode()
 	param := strings.Split(query, "=")[1]
 	return param
 }
 
+//DBから取得した日付データをYYYY/MM/DD形式に変換
 func TimeFormatter(datetime string) string {
 	arr := strings.Split(datetime, "-")
 	year := arr[0]

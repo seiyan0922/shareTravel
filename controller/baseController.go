@@ -50,14 +50,35 @@ func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	}
 }
 
+func autoMapperForView(elements ...interface{}) map[string]interface{} {
+	status := map[string]interface{}{}
+
+	for _, element := range elements {
+		switch element.(type) {
+		case *model.Event:
+			status["Event"] = element
+		case *model.Expense:
+			status["Expense"] = element
+		case []*model.Expense:
+			status["Expenses"] = element
+		case *model.Member:
+			status["Member"] = element
+		case *model.MemberExpense:
+			status["MemberExpense"] = element
+		}
+	}
+
+	return status
+}
+
 //エラーハンドラー
-func errorHandler(w http.ResponseWriter, path string, status map[interface{}]interface{}, errs map[string]string) {
+func errorHandler(w http.ResponseWriter, path string, status map[string]interface{}, errs map[string]string) {
 
 	if status != nil {
 		status["Errors"] = errs
 	} else {
 		//連携値がない場合マップを初期化する
-		status = map[interface{}]interface{}{}
+		status = map[string]interface{}{}
 		status["Errors"] = errs
 	}
 	RenderTemplate(w, path, status)

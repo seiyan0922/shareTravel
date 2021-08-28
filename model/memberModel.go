@@ -20,7 +20,7 @@ func (member *Member) SaveMember() {
 
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
-		fmt.Println("Prepare error")
+		fmt.Println(err)
 	}
 	t := time.Now()
 
@@ -28,7 +28,7 @@ func (member *Member) SaveMember() {
 	stmt.Exec(member.EventId, member.Name, t)
 
 	if err != nil {
-		fmt.Println("Exec error")
+		fmt.Println(err)
 	}
 }
 
@@ -37,7 +37,7 @@ func GetMembers(id int) []Member {
 	rows, err := Db.Query("SELECT id,name from member WHERE event_id = ?", id)
 
 	if err != nil {
-		fmt.Println("Query Error")
+		fmt.Println(err)
 	}
 
 	var members []Member
@@ -46,7 +46,7 @@ func GetMembers(id int) []Member {
 		member := Member{}
 		err := rows.Scan(&member.Id, &member.Name)
 		if err != nil {
-			fmt.Println("Scan error")
+			fmt.Println(err)
 			panic(err.Error())
 		}
 		members = append(members, member)
@@ -60,7 +60,7 @@ func (member *Member) GetMemberTemporarily() {
 	rows, err := Db.Query("SELECT total from expense WHERE temporarily_member = ?", member.Id)
 
 	if err != nil {
-		fmt.Println("Query Error")
+		fmt.Println(err)
 	}
 
 	var total_temporarily int
@@ -69,7 +69,7 @@ func (member *Member) GetMemberTemporarily() {
 		var temporarily int
 		err := rows.Scan(&temporarily)
 		if err != nil {
-			fmt.Println("Scan error")
+			fmt.Println(err)
 			panic(err.Error())
 		}
 		total_temporarily += temporarily

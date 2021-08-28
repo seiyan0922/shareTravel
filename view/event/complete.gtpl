@@ -9,21 +9,21 @@
                 <table class="form-table">
                     <tr>
                         <td>イベント名</td>
-                        <td>：{{.Name}}</td>
+                        <td>：{{.Event.Name}}</td>
                     </tr>
                     <tr>
                         <td>日付</td>
-                        <td>：{{.Date}}</td>
+                        <td>：{{.Event.Date}}</td>
                     </tr>
                 </table>
                 <div class="authkey-confirm">このイベントの認証IDは、
-                    <span class="red">{{.AuthKey}}</span>です
+                    <span class="red">{{.Event.AuthKey}}</span>です
                 </div>
                 <div class="alert-authkey">
                     ※こちらの認証IDは必ず控えて置くようにしてください。
                 </div>
                 <div class="back-common-box">
-                    <a href="/event/show?auth_key={{.AuthKey}}" class="back-common">{{.Name}}の詳細ページへ→</a>
+                    <a href="/event/show?auth_key={{.Event.Id}}" class="back-common">{{.Event.Name}}の詳細ページへ→</a>
                 </div>
         </div>
     </div>

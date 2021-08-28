@@ -57,23 +57,21 @@ func insert(table string, values map[string]interface{}) error {
 
 	var value_query string
 
-	map_len := len(values)
-
 	index := 0
 
 	for column, value := range values {
-		if index < map_len-1 {
-			column_query += column + ","
+		if index < len(values)-1 {
+			column_query += column + common.COMMA
 
 			switch value := value.(type) {
 			case int:
 				val_str := strconv.Itoa(value)
-				value_query += val_str + ","
+				value_query += val_str + common.COMMA
 			case string:
-				value_query += "'" + value + "',"
+				value_query += "'" + value + "'" + common.COMMA
 			case time.Time:
 				val_str := value.Format(common.TIME_LAYOUT)
-				value_query += "'" + val_str + "',"
+				value_query += "'" + val_str + "'" + common.COMMA
 			}
 		} else {
 			column_query += column
@@ -109,7 +107,59 @@ func insert(table string, values map[string]interface{}) error {
 	return nil
 }
 
-func MakeQueryR() {
+//DBから一つの結果を取得する際のシンプルなSELECT分の実行
+func find(table string, subjects []string, conditions map[string]interface{}) *sql.Row {
+
+	subjects_query := common.EMPTY
+	condition_query := common.EMPTY
+
+	for i, subject := range subjects {
+		if i < len(subjects)-1 {
+			subjects_query += subject + common.COMMA
+		} else {
+			subjects_query += subject
+		}
+	}
+
+	index := common.ZERO
+
+	for column, value := range conditions {
+		if index < len(conditions)-1 {
+			condition_query += column + "="
+
+			switch value := value.(type) {
+			case int:
+				val_str := strconv.Itoa(value)
+				condition_query += val_str + " AND "
+			case string:
+				condition_query += "'" + value + "' AND "
+			case time.Time:
+				val_str := value.Format(common.TIME_LAYOUT)
+				condition_query += "'" + val_str + "' AND "
+			}
+		} else {
+			condition_query += column + "="
+			switch value := value.(type) {
+			case int:
+				val_str := strconv.Itoa(value)
+				condition_query += val_str
+			case string:
+				condition_query += "'" + value + "'"
+			case time.Time:
+				val_str := value.Format(common.TIME_LAYOUT)
+				condition_query += "'" + val_str + "'"
+			}
+			break
+		}
+		index++
+
+	}
+
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s", subjects_query, table, condition_query)
+
+	row := Db.QueryRow(query)
+
+	return row
 
 }
 
