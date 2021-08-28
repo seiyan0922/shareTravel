@@ -1,42 +1,134 @@
 package model
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
 	"shareTravel/common"
-	"shareTravel/form"
 	"time"
 )
 
-type Event form.Event
+type Event struct {
+	Id         int
+	AuthKey    string
+	Pool       int
+	Name       string `validate:"required"`
+	Date       string `validate:"required"`
+	CreateTime time.Time
+	UpdateTime time.Time
+}
 
+var event_table = "event"
+
+var event_columns = [7]string{"id", "auth_key", "pool", "name", "date", "create_time", "update_time"}
+
+//イベント情報登録関数
 func (event *Event) CreateEvent() string {
-	OpenSQL()
-	defer Db.Close()
-	//認証キーの取得
-	key := createAuthKey()
-	statement := "insert into event (auth_key,name,date,create_time) values(?,?,?,?)"
-	stmt, err := Db.Prepare(statement)
+
+	//認証キー(ランダム文字列)の取得
+	//key, err := createAuthKey()
+	key := "0fQasfadsfas"
+	var err error
 	if err != nil {
-		fmt.Println("Prepare error")
+		fmt.Println(err)
 		return ""
 	}
-	t := time.Now()
 
-	defer stmt.Close()
-	stmt.Exec(key, event.Name, event.Date, t)
+	//認証キーの重複チェック
+	for {
+		if !DuplicateCheck(event_table, "auth_key", key) {
+			key, err = createAuthKey()
+			if err != nil {
+				fmt.Println(err)
+				return ""
+			}
+			continue
+		}
+		break
+	}
+
+	//認証IDの設定
+	event.AuthKey = key
+
+	//現在時刻の取得
+	now := time.Now()
+	event.CreateTime = now
+
+	//データ登録用のマップを生成
+	data := event.EventAutoMapperForModel()
+
+	//DB登録
+	err = insert(event_table, data)
 
 	if err != nil {
-		fmt.Println("Exec error")
-
+		fmt.Println(err)
 		return ""
 	}
+
+	//認証IDを返却
 	return key
 }
 
+//クエリ作成用マップのオートマッピング関数
+func (event *Event) EventAutoMapperForModel() map[string]interface{} {
+
+	//マップデータの初期化
+	data := map[string]interface{}{}
+
+	//各プロパティに対して値がセットされている場合、カラム名に紐づけてマッピング
+	if event.Id != 0 {
+		data[event_columns[0]] = event.Id
+	}
+
+	if event.AuthKey != "" {
+		data[event_columns[1]] = event.AuthKey
+	}
+
+	if event.Pool != 0 {
+		data[event_columns[2]] = event.Pool
+	}
+
+	if event.Name != "" {
+		data[event_columns[3]] = event.Name
+	}
+
+	if event.Date != "" {
+		data[event_columns[4]] = event.Date
+	}
+
+	if !event.CreateTime.IsZero() {
+		data[event_columns[5]] = event.CreateTime
+	}
+
+	if !event.UpdateTime.IsZero() {
+		data[event_columns[6]] = event.UpdateTime
+	}
+
+	//マッピングデータを返却
+	return data
+
+}
+
+//認証ID生成用関数
+func createAuthKey() (string, error) {
+
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+
+	var result string
+	for _, v := range b {
+		result += string(letters[int(v)%len(letters)])
+	}
+	return result, nil
+}
+
+//
+//リファクタリング未済
+//
 func GetEvent(event *Event) *Event {
-	OpenSQL()
-	defer Db.Close()
 
 	var err error
 
@@ -62,8 +154,6 @@ func (event *Event) UpdatePool(add int) {
 
 	var pool int
 
-	OpenSQL()
-	defer Db.Close()
 	//現在の端数プールを取得
 	err := Db.QueryRow("SELECT pool FROM event WHERE id = ?", event.Id).Scan(&pool)
 
@@ -95,8 +185,6 @@ func (event *Event) UpdatePool(add int) {
 }
 
 func (event *Event) EditPool(pool int, before_pool int) {
-	OpenSQL()
-	defer Db.Close()
 
 	err := Db.QueryRow("SELECT pool FROM event WHERE id = ?", event.Id).
 		Scan(&event.Pool)
@@ -120,20 +208,7 @@ func (event *Event) EditPool(pool int, before_pool int) {
 	stmt.Exec(after_pool, time.Now(), event.Id)
 }
 
-func createAuthKey() string {
-	var rs1Letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
-
-	key := make([]rune, 16)
-	for i := range key {
-		key[i] = rs1Letters[rand.Intn(len(rs1Letters))]
-	}
-	return string(key)
-}
-
 func (event *Event) UpdateEvent() {
-	OpenSQL()
-	defer Db.Close()
-	fmt.Println(event)
 
 	statement := "UPDATE event SET auth_key = ? ,name = ?,date = ? WHERE id = ? "
 

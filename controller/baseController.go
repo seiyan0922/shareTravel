@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"shareTravel/model"
 	"strings"
 	"text/template"
 )
@@ -31,14 +32,33 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 //
 var validPath = regexp.MustCompile("^/(top|event|member|expense)/([a-zA-Z0-9/]+)$")
 
-//
+//リクエストを受け取りURLに紐づく処理を実行する
 func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
+
+		//サーバー起動時にDBコネクションの起動
+		model.Connect()
+		//処理が完了した際コネクションをクローズする
+		defer model.Db.Close()
+
 		if m != nil {
 			fn(w, r, m[2])
 		} else {
 			fn(w, r, "")
 		}
 	}
+}
+
+//エラーハンドラー
+func errorHandler(w http.ResponseWriter, path string, status map[interface{}]interface{}, errs map[string]string) {
+
+	if status != nil {
+		status["Errors"] = errs
+	} else {
+		//連携値がない場合マップを初期化する
+		status = map[interface{}]interface{}{}
+		status["Errors"] = errs
+	}
+	RenderTemplate(w, path, status)
 }

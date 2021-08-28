@@ -4,52 +4,81 @@ import (
 	"fmt"
 	"net/http"
 	"shareTravel/common"
-	"shareTravel/form"
 	"shareTravel/model"
+	"shareTravel/validate"
 	"strconv"
 	"strings"
 )
 
 func EventHandler(w http.ResponseWriter, r *http.Request, path string) {
-	arr := strings.Split(path, "/")
-	switch arr[0] {
-	case "create":
+	arr := strings.Split(path, common.SLASH)
+	switch arr[common.ZERO] {
+	case CREATE:
 		createEventHandler(w, r)
-	case "confirm":
+	case CONFIRM:
 		confirmEventHandler(w, r)
-	case "save":
+	case SAVE:
 		saveEventHandler(w, r)
-	case "show":
+	case SHOW:
 		showEventHandler(w, r)
-	case "search":
+	case SEARCH:
 		searchEventHandler(w, r)
-	case "indexMember":
+	case INDEX_MEMBER:
 		showMembersEventHandler(w, r)
-	case "edit":
+	case EDIT:
 		editEventHandler(w, r)
-	case "download":
+	case DOWNLOAD:
 		csvDownLoad(w, r)
 	}
 }
 
+//新規イベント作成画面表示
 func createEventHandler(w http.ResponseWriter, r *http.Request) {
 	RenderTemplate(w, "view/event/create", nil)
 }
 
+//新規イベント確認画面表示
 func confirmEventHandler(w http.ResponseWriter, r *http.Request) {
-	event := new(form.Event)
-	event.Name = r.FormValue("name")
-	event.Date = r.FormValue("datetime")
+
+	//入力値を構造体に変換
+	event, _ := formValueEncodeForEvent(r)
+
+	//バリデーションチェック
+	if ok, errs := validate.EventValidater(event); !ok {
+		errorHandler(w, "view/event/create", nil, errs)
+	}
 
 	RenderTemplate(w, "view/event/confirm", event)
 }
 
+//リクエストをもとに入力値をイベント用構造体に変換
+func formValueEncodeForEvent(r *http.Request) (*model.Event, error) {
+	event := new(model.Event)
+
+	if name := r.FormValue("name"); name != EMPTY {
+		event.Name = name
+	}
+
+	if pool := r.FormValue("pool"); pool != EMPTY {
+		event.Pool, _ = strconv.Atoi(pool)
+	}
+
+	if datetime := r.FormValue("datetime"); datetime != EMPTY {
+		event.Date = datetime
+	}
+
+	return event, nil
+
+}
+
+//リファクタリング未済
+
+//新規イベント作成完了画面表示
 func saveEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	event := new(model.Event)
 	event.Name = r.FormValue("name")
 	event.Date = r.FormValue("date")
-	fmt.Println(r.FormValue("name"))
 	key := event.CreateEvent()
 	event.AuthKey = key
 	RenderTemplate(w, "view/event/complete", event)

@@ -2,15 +2,20 @@ package model
 
 import (
 	"fmt"
-	"shareTravel/form"
 	"time"
 )
 
-type Member form.Member
+type Member struct {
+	Id          int
+	EventId     int
+	Name        string
+	Temporarily int
+	Calculate   int
+	Total       int
+}
 
 func (member *Member) SaveMember() {
-	OpenSQL()
-	defer Db.Close()
+
 	statement := "insert into member (event_id,name,create_time) values(?,?,?)"
 
 	stmt, err := Db.Prepare(statement)
@@ -28,9 +33,6 @@ func (member *Member) SaveMember() {
 }
 
 func GetMembers(id int) []Member {
-
-	OpenSQL()
-	defer Db.Close()
 
 	rows, err := Db.Query("SELECT id,name from member WHERE event_id = ?", id)
 
@@ -54,8 +56,6 @@ func GetMembers(id int) []Member {
 }
 
 func (member *Member) GetMemberTemporarily() {
-	OpenSQL()
-	defer Db.Close()
 
 	rows, err := Db.Query("SELECT total from expense WHERE temporarily_member = ?", member.Id)
 

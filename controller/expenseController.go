@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"shareTravel/common"
-	"shareTravel/form"
 	"shareTravel/model"
 	"strconv"
 	"strings"
@@ -36,7 +35,7 @@ func addExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 	//クエリパラメータの取得
 	event_id := common.GetQueryParam(r)
-	event := new(form.Event)
+	event := new(model.Event)
 	event.Id, _ = strconv.Atoi(event_id)
 
 	RenderTemplate(w, "view/expense/add", event)
@@ -46,7 +45,7 @@ func addExpenseHandler(w http.ResponseWriter, r *http.Request) {
 func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 	event_id := common.GetQueryParam(r)
-	event := new(form.Event)
+	event := new(model.Event)
 	event.Id, _ = strconv.Atoi(event_id)
 
 	expense := new(model.Expense)

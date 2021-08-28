@@ -2,14 +2,21 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"shareTravel/controller"
 )
 
 func main() {
+	//環境変数の設定
+	//DB設定
+	os.Setenv("Driver", "mysql")
+	os.Setenv("User", "root")
+	os.Setenv("Pass", "")
+	os.Setenv("Host", "127.0.0.1")
+	os.Setenv("Port", "3306")
+	os.Setenv("DataBase", "share_travel")
+
 	http.HandleFunc("/", controller.MakeHandler(controller.TopHandler))
-	http.HandleFunc("/view/", controller.MakeHandler(controller.ViewHandler))
-	http.HandleFunc("/create/", controller.MakeHandler(controller.CreateUserHandler))
-	http.HandleFunc("/index/", controller.MakeHandler(controller.IndexUserHandler))
 	http.HandleFunc("/event/", controller.MakeHandler(controller.EventHandler))
 	http.HandleFunc("/member/", controller.MakeHandler(controller.MemberHandler))
 	http.HandleFunc("/expense/", controller.MakeHandler(controller.ExpenseHandler))
