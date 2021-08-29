@@ -166,14 +166,6 @@ func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//参加メンバー負担金総額取得処理
-// func GetMembersTotal(members []*model.Member) []*model.Member {
-// 	for i := 0; i < len(members); i++ {
-// 		members[i].GetMemberExpense()
-// 	}
-// 	return members
-// }
-
 //
 //
 //
@@ -242,6 +234,7 @@ func editEventHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//csvダウンロード
 func csvDownLoad(w http.ResponseWriter, r *http.Request) {
 
 	event := new(model.Event)
@@ -254,7 +247,7 @@ func csvDownLoad(w http.ResponseWriter, r *http.Request) {
 
 	expenses := event.GetExpenses()
 
-	head_line := event.Name + ",\n" + "端数合計" + strconv.Itoa(event.Pool) + "\n"
+	head_line := event.Name + ",\n" + "端数合計," + strconv.Itoa(event.Pool) + "円\n"
 
 	expense_lines := ","
 

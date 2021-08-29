@@ -184,6 +184,8 @@ func (expense *Expense) UpdateExpense() {
 	statement := "UPDATE expense SET temporarily_member = ? ,update_time = ? WHERE id = ?"
 	stmt, err := Db.Prepare(statement)
 
+	fmt.Println(expense.TemporarilyMemberId)
+
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -191,14 +193,16 @@ func (expense *Expense) UpdateExpense() {
 
 	defer stmt.Close()
 	stmt.Exec(expense.TemporarilyMemberId, time.Now(), expense.Id)
+
+	fmt.Println(expense.Id)
 }
 
 func (expense *Expense) GetExpense() {
 
-	select_columns := []string{member_expense_columns[1], member_expense_columns[2], member_expense_columns[3], member_expense_columns[4],
-		member_expense_columns[5], member_expense_columns[6]}
+	select_columns := []string{expense_columns[1], expense_columns[2], expense_columns[3], expense_columns[4],
+		expense_columns[5], expense_columns[6]}
 	status := expense.ExpenseAutoMapperForModel()
-	row := find(member_expense_table, select_columns, status)
+	row := find(expense_table, select_columns, status)
 
 	err := row.Scan(&expense.EventId, &expense.TemporarilyMemberId, &expense.Total, &expense.Remarks, &expense.Name, &expense.Pool)
 

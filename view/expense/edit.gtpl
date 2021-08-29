@@ -47,12 +47,12 @@
                         </tr>
                         <tr>
                             <td>端数</td>
-                            <td>：{{.Pool}}円</td>
+                            <td>：{{.Expense.Pool}}円</td>
                         </tr>
                     </table>
                     <div class="expense-info">※金額は各参加者に等分されます。</div>
                     <div class="expense-info"></div>
-                    <form action="/expense/update?event_id={{.Event.Id}}" method="POST">
+                    <form action="/expense/update?expense_id={{.Expense.Id}}" method="POST">
                         <table class="form-table">
 
                             {{range $member := .Members}}
@@ -73,13 +73,11 @@
                             <label for="slash">100円以下切捨て</label>
                         </div>
                         <input type="hidden" name="event" value="{{.Event.Id}}">
-                        <input type="hidden" name="expense" value="{{.Expense}}">
                         <input type="hidden" name="total" value="{{.Expense.Total}}">
-                        <input type="hidden" name="pool" value="{{.Pool}}">
-                        <input type="hidden" name="before_pool" value="{{.BeforePool}}">
+                        <input type="hidden" name="pool" value="{{.Expense.Pool}}">
+                        <input type="hidden" name="beforepool" value="{{.BeforePool}}">
                         <input type="hidden" name="name" value="{{.Expense.Name}}">
                         <input type="hidden" name="remarks" value="{{.Expense.Remarks}}">
-                        <input type="hidden" name="members" value="{{.Members}}">
                         <input type="hidden" name="edit" value="true">
                         
                         <div class="saikeisan">
@@ -90,13 +88,13 @@
                             <div class="temporarily-labels">
                                 {{$temporarily := .Expense.TemporarilyMemberId}}
                                 {{range $member := .Members}}
-                                {{if eq $temporarily .Id}}
-                                <input type="radio" id="temporarily{{.Id}}" name="temporarily" value="{{.Id}}" checked="checked">
-                                {{else}}
-                                <input type="radio" id="temporarily{{.Id}}" name="temporarily" value="{{.Id}}">
-                                {{end}}
-                                <label for="temporarily{{.Id}}">{{.Name}}</label></br>
-                                {{end}}
+                                    {{if eq $temporarily .Id}}
+                                        <input type="radio" id="temporarily{{.Id}}" name="temporarily" value="{{.Id}}" checked="checked">
+                                    {{else}}
+                                        <input type="radio" id="temporarily{{.Id}}" name="temporarily" value="{{.Id}}">
+                                    {{end}}
+                                        <label for="temporarily{{.Id}}">{{.Name}}</label></br>
+                                    {{end}}
                             </div>
                         </div>
                         <div class="common-submit-box">
