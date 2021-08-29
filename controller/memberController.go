@@ -1,78 +1,74 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
+	"shareTravel/common"
 	"shareTravel/model"
+	"shareTravel/validate"
 	"strconv"
 	"strings"
 )
 
 func MemberHandler(w http.ResponseWriter, r *http.Request, path string) {
-	arr := strings.Split(path, "/")
+	arr := strings.Split(path, SLASH)
 	switch arr[0] {
-	case "add":
+	case ADD:
 		memberAddHandler(w, r)
-	case "save":
+	case SAVE:
 		memberSaveHandler(w, r)
 	}
 }
 
+//参加者追加ハンドラー
 func memberAddHandler(w http.ResponseWriter, r *http.Request) {
 	event := new(model.Event)
-	query := r.URL.Query().Encode()
-	strid := strings.Split(query, "=")[1]
-	event.Id, _ = strconv.Atoi(strid)
+	str_id := common.GetQueryParam(r)
+	event.Id, _ = strconv.Atoi(str_id)
 
-	RenderTemplate(w, "view/member/add", event)
+	status := autoMapperForView(event)
+
+	//参加者追加画面をレンダリング
+	RenderTemplate(w, MEMBER_ADD_PATH, status)
 }
 
+//参加者保存ハンドラー
 func memberSaveHandler(w http.ResponseWriter, r *http.Request) {
+
+	//参加者ポインタ
 	member := new(model.Member)
+
+	//入力値を設定
 	member.Name = r.FormValue("name")
 
-	query := r.URL.Query().Encode()
-	strid := strings.Split(query, "=")[1]
-	member.EventId, _ = strconv.Atoi(strid)
-
-	member.SaveMember()
-
-	RenderTemplate(w, "view/member/complete", member)
-}
-
-func postMembersCnv(str_members string) []model.Member {
-
-	replaced1 := strings.Replace(str_members, "[", "", -1)
-	replaced2 := strings.Replace(replaced1, "]", "", -1)
-	replaced3 := strings.Replace(replaced2, "{", "", -1)
-
-	members_arr := strings.Split(replaced3, "} ")
-
-	var members []model.Member
-
-	for _, str_member := range members_arr {
-		member_arr := strings.Split(str_member, " ")
-
-		member_id, _ := strconv.Atoi(member_arr[0])
-		event_id, _ := strconv.Atoi(member_arr[1])
-		name := member_arr[2]
-
-		var member model.Member
-		member.Id = member_id
-		member.EventId = event_id
-		member.Name = name
-
-		members = append(members, member)
+	//バリデーションチェック
+	if ok, errs := validate.MemberValidater(member); !ok {
+		//バリデーションエラーがあった場合、エラーハンドリング
+		errorHandler(w, MEMBER_ADD_PATH, nil, errs)
+		return
 	}
 
-	return members
+	//クエリパラメータの取得、構造体への設定
+	str_event_id := common.GetQueryParam(r)
+	member.EventId, _ = strconv.Atoi(str_event_id)
 
-}
+	//参加者保存処理
+	err := member.SaveMember()
 
-//参加メンバー負担金総額取得処理
-func GetMembersTotal(members []model.Member) []model.Member {
-	for i := 0; i < len(members); i++ {
-		model.GetMemberExpense(&members[i])
+	event := new(model.Event)
+	event.Id = member.EventId
+
+	if err != nil {
+		errs := map[string]string{}
+		errs["Error"] = "予期せぬエラーが発生しました。"
+		status := autoMapperForView(event)
+		errorHandler(w, ERROR_PATH, status, errs)
+		return
 	}
 
-	return members
+	status := autoMapperForView(event, member)
+
+	fmt.Println(status)
+
+	RenderTemplate(w, MEMBER_COMPLETE_PATH, status)
 }

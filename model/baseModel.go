@@ -35,13 +35,12 @@ func Connect() {
 //重複チェック
 func DuplicateCheck(table string, item string, value interface{}) bool {
 	var id int
-	query := fmt.Sprintf("SELECT id FROM %s WHERE %s = ?", table, item)
+	query := fmt.Sprintf("SELECT id FROM %s WHERE %s = ?;", table, item)
 	err := Db.QueryRow(query, value).Scan(&id)
 
 	if err == nil {
 		return false
 	} else {
-		fmt.Println(err)
 		return true
 	}
 }
@@ -91,7 +90,7 @@ func insert(table string, values map[string]interface{}) error {
 	}
 
 	column_query = common.SPACE + "(" + column_query + ")" + common.SPACE
-	value_query = "values(" + value_query + ")"
+	value_query = "values(" + value_query + ");"
 
 	query += column_query + value_query
 
@@ -102,7 +101,12 @@ func insert(table string, values map[string]interface{}) error {
 	}
 	defer stmt.Close()
 
-	stmt.Exec()
+	_, err = stmt.Exec()
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
 	return nil
 }
@@ -110,6 +114,27 @@ func insert(table string, values map[string]interface{}) error {
 //DBから一つの結果を取得する際のシンプルなSELECT分の実行
 func find(table string, subjects []string, conditions map[string]interface{}) *sql.Row {
 
+	query := setSelectQuery(table, subjects, conditions)
+
+	row := Db.QueryRow(query)
+
+	return row
+
+}
+
+//シンプルなSELECT文の作成
+func findAll(table string, subject []string, conditions map[string]interface{}) (*sql.Rows, error) {
+
+	query := setSelectQuery(table, subject, conditions)
+
+	fmt.Println(query)
+	rows, err := Db.Query(query)
+
+	return rows, err
+}
+
+//SELECT文の作成
+func setSelectQuery(table string, subjects []string, conditions map[string]interface{}) string {
 	subjects_query := common.EMPTY
 	condition_query := common.EMPTY
 
@@ -155,18 +180,7 @@ func find(table string, subjects []string, conditions map[string]interface{}) *s
 
 	}
 
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s", subjects_query, table, condition_query)
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s;", subjects_query, table, condition_query)
 
-	row := Db.QueryRow(query)
-
-	return row
-
-}
-
-func MakeQueryU() {
-
-}
-
-func MakeQueryD() {
-
+	return query
 }

@@ -22,14 +22,14 @@ var event_table = "event"
 var event_columns = []string{"id", "auth_key", "pool", "name", "date", "create_time", "update_time"}
 
 //イベント情報登録関数
-func (event *Event) CreateEvent() *Event {
+func (event *Event) CreateEvent() {
 
 	//認証キー(ランダム文字列)の取得
 	//key, err := createAuthKey()
 	key, err := createAuthKey()
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return
 	}
 
 	//認証キーの重複チェック
@@ -38,7 +38,7 @@ func (event *Event) CreateEvent() *Event {
 			key, err = createAuthKey()
 			if err != nil {
 				fmt.Println(err)
-				return nil
+				return
 			}
 			continue
 		}
@@ -60,15 +60,11 @@ func (event *Event) CreateEvent() *Event {
 
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return
 	}
 
 	event.AuthKey = key
 
-	event.GetEvent()
-
-	//認証IDを返却
-	return event
 }
 
 func (event *Event) GetEvent() {
@@ -76,9 +72,11 @@ func (event *Event) GetEvent() {
 	//データ検索用のマップを生成
 	data := event.EventAutoMapperForModel()
 
-	//データ検索を実行、スキャン
-	err := find(event_table, event_columns, data).Scan(&event.Id, &event.AuthKey, &event.Name, &event.Date, &event.Pool)
+	//取得値を指定
+	columns := []string{event_columns[0], event_columns[1], event_columns[2], event_columns[3], event_columns[4]}
 
+	//データ検索を実行、スキャン
+	err := find(event_table, columns, data).Scan(&event.Id, &event.AuthKey, &event.Pool, &event.Name, &event.Date)
 	if err != nil {
 		return
 	}
@@ -144,11 +142,7 @@ func createAuthKey() (string, error) {
 	return result, nil
 }
 
-//
-//リファクタリング未済
-//
-
-func (event *Event) UpdatePool(add int) {
+func (event *Event) UpdatePool(add int) error {
 
 	var pool int
 
@@ -158,7 +152,7 @@ func (event *Event) UpdatePool(add int) {
 	if err != nil {
 		//変数書き換えに失敗した場合終了
 		fmt.Println(err)
-		return
+		return err
 	}
 
 	//レコードの更新処理
@@ -166,7 +160,7 @@ func (event *Event) UpdatePool(add int) {
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		fmt.Println(err)
-		return
+		return err
 	}
 
 	//現在時刻を取得
@@ -180,7 +174,13 @@ func (event *Event) UpdatePool(add int) {
 
 	//SQL実行
 	stmt.Exec(pool, t, event.Id)
+
+	return nil
 }
+
+//
+//リファクタリング未済
+//
 
 func (event *Event) EditPool(pool int, before_pool int) {
 

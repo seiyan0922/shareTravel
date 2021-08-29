@@ -52,7 +52,7 @@
                                 <tr class="event-top-table-content">
                                     <td class="item-name">{{$expense.Name}}</td>
                                     <td class="item-name-total">{{$expense.Total}}円</td>
-                                    <td class="item-time">{{$expense.CreateTime}}</td>
+                                    <td class="item-time">{{$expense.DateStr}}</td>
                                     <td class="item-remarks">{{$expense.Remarks}}</td>
                                     <td class="item-link">
 

@@ -48,6 +48,7 @@ func confirmEventHandler(w http.ResponseWriter, r *http.Request) {
 	if ok, errs := validate.EventValidater(event); !ok {
 		//バリデーションエラーがあった場合
 		errorHandler(w, EVENT_CREATE_PATH, nil, errs)
+		return
 	}
 
 	//クライアントへの連携値を整形
@@ -65,10 +66,15 @@ func saveEventHandler(w http.ResponseWriter, r *http.Request) {
 	if ok, errs := validate.EventValidater(event); !ok {
 		//バリデーションエラーがあった場合
 		errorHandler(w, EVENT_CREATE_PATH, nil, errs)
+		return
 	}
 
 	//DB登録処理
-	event = event.CreateEvent()
+	event.CreateEvent()
+
+	//TODO処理の簡略化
+	//保存したイベントの取得(idを取得するため)
+	event.GetEvent()
 
 	//クライアントへの連携値を整形
 	status := autoMapperForView(event)
@@ -121,13 +127,52 @@ func showEventHandler(w http.ResponseWriter, r *http.Request) {
 //イベントTOP画面レンダー
 func showEventRender(w http.ResponseWriter, event *model.Event) {
 
-	expenses := event.GetExpensesByEventId()
+	expenses := event.GetExpenses()
 
 	status := autoMapperForView(event, expenses)
 
-	RenderTemplate(w, "view/event/show", status)
+	RenderTemplate(w, EVENT_SHOW_PATH, status)
 
 }
+
+//参加者一覧表示
+func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
+
+	//イベントとポインタの設定
+	event := new(model.Event)
+	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
+	event.Id = event_id
+	event.GetEvent()
+
+	//参加者一覧の取得
+	members := model.GetMembers(event.Id)
+
+	//支払い情報
+	expenses := event.GetExpenses()
+
+	//参加者情報と支払い情報があった場合、各参加者の負担金、立替金を取得
+	if members != nil && expenses != nil {
+		for i := 0; i < len(members); i++ {
+			members[i].GetMemberTemporarily()
+			members[i].GetMemberExpense()
+		}
+	}
+
+	//画面出力用データの成形
+	status := autoMapperForView(event, members)
+
+	//画面のレンダリング
+	RenderTemplate(w, SHOW_MEMBERS_PATH, status)
+
+}
+
+//参加メンバー負担金総額取得処理
+// func GetMembersTotal(members []*model.Member) []*model.Member {
+// 	for i := 0; i < len(members); i++ {
+// 		members[i].GetMemberExpense()
+// 	}
+// 	return members
+// }
 
 //
 //
@@ -144,46 +189,6 @@ func showEventRender(w http.ResponseWriter, event *model.Event) {
 //
 //
 //
-
-func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
-	event := new(model.Event)
-	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
-	event.Id = event_id
-
-	event.GetEvent()
-
-	members := model.GetMembers(event_id)
-
-	//各参加者の立替金を取得
-	for i := 0; i < len(members); i++ {
-		members[i].GetMemberTemporarily()
-	}
-
-	nomember_flg := false
-	if len(members) == 0 {
-		nomember_flg = true
-	} else {
-		//参加メンバー負担金総額取得処理
-		GetMembersTotal(members)
-	}
-	showMembersEventRender(w, event, &members, nomember_flg)
-
-}
-
-func showMembersEventRender(w http.ResponseWriter, event *model.Event, members *[]model.Member, nomember_flg bool) {
-
-	status := make(map[string]interface{})
-	status["Event"] = event
-
-	if !nomember_flg {
-		status["Members"] = members
-	} else {
-		status["Members"] = nil
-	}
-
-	RenderTemplate(w, "view/event/showMember", status)
-
-}
 
 func searchEventHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -247,7 +252,7 @@ func csvDownLoad(w http.ResponseWriter, r *http.Request) {
 
 	members := model.GetMembers(event.Id)
 
-	expenses := event.GetExpensesByEventId()
+	expenses := event.GetExpenses()
 
 	head_line := event.Name + ",\n" + "端数合計" + strconv.Itoa(event.Pool) + "\n"
 
@@ -274,7 +279,7 @@ func csvDownLoad(w http.ResponseWriter, r *http.Request) {
 				temp += expense.Total
 			}
 		}
-		model.GetMemberExpense(&member)
+		member.GetMemberExpense()
 		member_lines += strconv.Itoa(member.Total) + "円," + strconv.Itoa(temp) + "円," +
 			strconv.Itoa(member.Total-temp) + "円\n"
 	}

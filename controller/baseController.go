@@ -12,9 +12,9 @@ import (
 //テンプレートファイルの読み込み関数
 func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 
-	templates := template.Must(template.ParseFiles(tmpl+".gtpl", "view/common/_footer.gtpl", "view/common/_header.gtpl"))
+	templates := template.Must(template.ParseFiles(tmpl+".gtpl", FOOTER_PATH, HEADER_PATH))
 
-	arr := strings.Split(tmpl, "/")
+	arr := strings.Split(tmpl, SLASH)
 
 	file := arr[len(arr)-1]
 
@@ -30,7 +30,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 }
 
 //
-var validPath = regexp.MustCompile("^/(top|event|member|expense)/([a-zA-Z0-9/]+)$")
+var validPath = regexp.MustCompile("^/(event|member|expense|error)/([a-zA-Z0-9/]+)$")
 
 //リクエストを受け取りURLに紐づく処理を実行する
 func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
@@ -63,6 +63,8 @@ func autoMapperForView(elements ...interface{}) map[string]interface{} {
 			status["Expenses"] = element
 		case *model.Member:
 			status["Member"] = element
+		case []*model.Member:
+			status["Members"] = element
 		case *model.MemberExpense:
 			status["MemberExpense"] = element
 		}

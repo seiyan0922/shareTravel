@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <div class="common-header">
-            <a href="/top/">
+            <a href="/">
             <div class="header-title">SHARE-TRAVEL</div>
         </a>
         </div>

@@ -10,32 +10,87 @@ type MemberExpense struct {
 	MemberId   int
 	ExpenseId  int
 	Price      int
-	CreateTime string
+	CreateTime time.Time
+	UpdateTime time.Time
 }
 
-func (member_expense *MemberExpense) CreateMemberExpense() {
+var member_expense_table = "member_expense"
+var member_expense_columns = []string{"id", "member_id", "expense_id", "price", "create_time", "update_time"}
 
-	t := time.Now()
+func (member_expense *MemberExpense) CreateMemberExpense() error {
 
-	//クエリの作成
-	statement := "INSERT INTO member_expense (member_id,expense_id,price,create_time) VALUES(?,?,?,?)"
+	//構造体をマップに変換
+	status := member_expense.MemberExpenseAutoMapperForModel()
 
-	//実行準備
-	stmt, err := Db.Prepare(statement)
-
-	//クエリ実行
-	_, err2 := stmt.Exec(member_expense.MemberId, member_expense.ExpenseId, member_expense.Price, t)
+	//データ保存
+	err := insert(member_expense_table, status)
 
 	if err != nil {
 		fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
+//DB操作用のカラムと値の紐付けを行う
+func (member_expense *MemberExpense) MemberExpenseAutoMapperForModel() map[string]interface{} {
+
+	//マップデータの初期化
+	data := map[string]interface{}{}
+
+	//各プロパティに対して値がセットされている場合、カラム名に紐づけてマッピング
+	if member_expense.Id != 0 {
+		data[member_expense_columns[0]] = member_expense.Id
 	}
 
-	defer stmt.Close()
+	if member_expense.MemberId != 0 {
+		data[member_expense_columns[1]] = member_expense.MemberId
+	}
 
-	if err2 != nil {
-		fmt.Println(err)
+	if member_expense.ExpenseId != 0 {
+		data[member_expense_columns[2]] = member_expense.ExpenseId
+	}
+
+	if member_expense.Price != 0 {
+		data[member_expense_columns[3]] = member_expense.Price
+	}
+
+	if !member_expense.CreateTime.IsZero() {
+		data[member_expense_columns[4]] = member_expense.CreateTime
+	}
+
+	if !member_expense.UpdateTime.IsZero() {
+		data[member_expense_columns[5]] = member_expense.UpdateTime
+	}
+
+	//マッピングデータを返却
+	return data
+
+}
+
+func (member *Member) SearchMemberExpense(expense_id int) {
+
+	err := Db.QueryRow("SELECT price FROM member_expense WHERE member_id = ? AND expense_id = ?", member.Id, expense_id).
+		Scan(&member.Calculate)
+
+	if err != nil {
+		member.Calculate = 0
 	}
 }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 func GetMemberExpensesAll(member_id int) []MemberExpense {
 
@@ -61,7 +116,7 @@ func GetMemberExpensesAll(member_id int) []MemberExpense {
 	return member_expenses
 }
 
-func GetMemberExpense(member *Member) {
+func (member *Member) GetMemberExpense() {
 
 	//クエリ実行
 	rows, err := Db.Query("SELECT price from member_expense WHERE member_id = ?", member.Id)
@@ -83,16 +138,6 @@ func GetMemberExpense(member *Member) {
 	}
 
 	member.Total = totalExpense
-}
-
-func (member *Member) SearchMemberExpense(expense_id int) {
-
-	err := Db.QueryRow("SELECT price FROM member_expense WHERE member_id = ? AND expense_id = ?", member.Id, expense_id).
-		Scan(&member.Calculate)
-
-	if err != nil {
-		member.Calculate = 0
-	}
 }
 
 func (member_expense *MemberExpense) UpdateMemberExpense() {

@@ -6,7 +6,7 @@
             <div class="gray-line"></div>
             <div>
                 {{range $err := .Errors}}
-                <div class="error" style="color:red">{{$err}}</div>
+                <div class="error" style="color:red; text-align: center;">{{$err}}</div>
                 {{end}}
                 <div class="new-event-form-box">
                     <form action="/event/confirm" method="POST">

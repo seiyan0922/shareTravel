@@ -23,7 +23,7 @@
                     ※こちらの認証IDは必ず控えて置くようにしてください。
                 </div>
                 <div class="back-common-box">
-                    <a href="/event/show?auth_key={{.Event.Id}}" class="back-common">{{.Event.Name}}の詳細ページへ→</a>
+                    <a href="/event/show?event_id={{.Event.Id}}" class="back-common">{{.Event.Name}}の詳細ページへ→</a>
                 </div>
         </div>
     </div>
