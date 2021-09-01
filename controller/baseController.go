@@ -12,12 +12,13 @@ import (
 //テンプレートファイルの読み込み関数
 func RenderTemplate(w http.ResponseWriter, tmpl string, i interface{}) {
 
-	templates := template.Must(template.ParseFiles(tmpl+".gtpl", FOOTER_PATH, HEADER_PATH))
+	templates := template.Must(template.ParseFiles(tmpl+".gtpl", SIDEBAR_PATH, FOOTER_PATH, HEADER_PATH))
 
 	arr := strings.Split(tmpl, SLASH)
 
 	file := arr[len(arr)-1]
 
+	templates.ExecuteTemplate(w, "_sidebar.gtpl", nil)
 	templates.ExecuteTemplate(w, "_header.gtpl", nil)
 	templates.ExecuteTemplate(w, "_footer.gtpl", nil)
 	err := templates.ExecuteTemplate(w, file+".gtpl", i)

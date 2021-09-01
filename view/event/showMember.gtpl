@@ -1,25 +1,6 @@
 {{ template "header"}}
 <div class="body">
-    <div class="side-bar">
-        <div class="icon-common">
-            <a href="/member/add?event_id={{.Event.Id}}" class="member-add">
-                <div class="member-icon"></div>
-                <div class="add-member-text">メンバー追加</div>
-            </a>
-        </div>
-        <div class="icon-common">
-            <a href="/expense/add?event_id={{.Event.Id}}" class="member-add">
-                <div class="expense-icon"></div>
-                <div class="expense-text">会計追加</div>
-            </a>
-        </div>
-        <div class="icon-common">
-            <a href="/event/download?event_id={{.Event.Id}}" class="member-add">
-                <div class="download-icon"></div>
-                <div class="download-text">ダウンロード</div>
-            </a>
-        </div>
-    </div>
+    {{template "sidebar"}}
     <div class="event-content .clearfix">
         <div class="event-header">
             <div class="event-icon"></div>

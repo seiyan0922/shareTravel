@@ -110,11 +110,8 @@ func showEventHandler(w http.ResponseWriter, r *http.Request) {
 	//構造体ポインタの作成
 	event := new(model.Event)
 
-	//クエリパラメータの取得
-	id_str := common.GetQueryParam(r)
-
 	//クエリパラメータを整数型に変換
-	event.Id, _ = strconv.Atoi(id_str)
+	event.Id, _ = strconv.Atoi(common.GetQueryParam(r))
 
 	//イベントIDに紐づくイベントを取得
 	event.GetEvent()
@@ -140,8 +137,7 @@ func showMembersEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	//イベントとポインタの設定
 	event := new(model.Event)
-	event_id, _ := strconv.Atoi(common.GetQueryParam(r))
-	event.Id = event_id
+	event.Id, _ = strconv.Atoi(common.GetQueryParam(r))
 	event.GetEvent()
 
 	//参加者一覧の取得
@@ -188,7 +184,7 @@ func searchEventHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		//GETの場合テンプレートを読み込み
-		RenderTemplate(w, "view/event/search", nil)
+		RenderTemplate(w, EVENT_SEARCH_PATH, nil)
 	case "POST":
 		//POSTの場合認証キーから該当のイベントを検索
 		auth_key := r.FormValue("auth_key")
@@ -197,30 +193,33 @@ func searchEventHandler(w http.ResponseWriter, r *http.Request) {
 		event.GetEvent()
 
 		//イベント取得に成功した場合
-		if event != nil {
+		if event.Id != 0 {
 			//イベントTOPページの読み込み
 			showEventRender(w, event)
 
 		} else {
-			RenderTemplate(w, "view/event/search", nil)
+			errs := map[string]string{}
+			errs["Error"] = "存在しない認証IDです。"
+			errorHandler(w, EVENT_SEARCH_PATH, nil, errs)
 		}
 	}
 }
 
-//イベント設計ページ
+//イベント設定ページ
 func editEventHandler(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query().Encode()
-	qarr := strings.Split(query, "=")
+
 	event := new(model.Event)
-	event.Id, _ = strconv.Atoi(qarr[1])
+	event.Id, _ = strconv.Atoi(common.GetQueryParam(r))
 
 	//リクエストメソッドによる条件分岐
 	switch r.Method {
 	case "GET":
 		event.GetEvent()
 
+		status := autoMapperForView(event)
+
 		//イベント編集テンプレートの読み込み
-		RenderTemplate(w, "view/event/edit", event)
+		RenderTemplate(w, EVENT_EDIT_PATH, status)
 
 	case "POST":
 		event.AuthKey = r.FormValue("auth_key")

@@ -160,31 +160,10 @@ func (expense *Expense) AddExpense() (int, error) {
 	return id, nil
 }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//リファクタリング未済
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
 func (expense *Expense) UpdateExpense() {
 
 	statement := "UPDATE expense SET temporarily_member = ? ,update_time = ? WHERE id = ?"
 	stmt, err := Db.Prepare(statement)
-
-	fmt.Println(expense.TemporarilyMemberId)
 
 	if err != nil {
 		fmt.Println(err)
@@ -193,8 +172,6 @@ func (expense *Expense) UpdateExpense() {
 
 	defer stmt.Close()
 	stmt.Exec(expense.TemporarilyMemberId, time.Now(), expense.Id)
-
-	fmt.Println(expense.Id)
 }
 
 func (expense *Expense) GetExpense() {

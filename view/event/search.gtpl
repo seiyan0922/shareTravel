@@ -12,6 +12,9 @@
                                 <td>
                                     <label for="auth_key">イベントID</label>
                                 </td>
+                                {{range $err := .Errors}}
+                                <div class="error" style="color:red; text-align: center;">{{$err}}</div>
+                                {{end}}
                                 <td>
                                     ：<input type="text" name="auth_key" class="form-common">
                                 </td>

@@ -178,14 +178,12 @@ func (event *Event) UpdatePool(add int) error {
 	return nil
 }
 
-//
-//リファクタリング未済
-//
-
 func (event *Event) EditPool(pool int, before_pool int) {
 
-	err := Db.QueryRow("SELECT pool FROM event WHERE id = ?", event.Id).
-		Scan(&event.Pool)
+	select_column := []string{event_columns[2]}
+	status := event.EventAutoMapperForModel()
+	row := find(event_table, select_column, status)
+	err := row.Scan(&event.Pool)
 
 	if err != nil {
 		fmt.Println(err)
@@ -195,13 +193,12 @@ func (event *Event) EditPool(pool int, before_pool int) {
 	after_pool := event.Pool - before_pool + pool
 
 	statement := "UPDATE event SET pool = ?,update_time = ? WHERE id = ?"
-	stmt, err2 := Db.Prepare(statement)
+	stmt, err := Db.Prepare(statement)
 
-	if err2 != nil {
-		fmt.Println(err2)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
-
 	defer stmt.Close()
 	stmt.Exec(after_pool, time.Now(), event.Id)
 }

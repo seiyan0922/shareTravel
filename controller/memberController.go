@@ -23,8 +23,7 @@ func MemberHandler(w http.ResponseWriter, r *http.Request, path string) {
 //参加者追加ハンドラー
 func memberAddHandler(w http.ResponseWriter, r *http.Request) {
 	event := new(model.Event)
-	str_id := common.GetQueryParam(r)
-	event.Id, _ = strconv.Atoi(str_id)
+	event.Id, _ = strconv.Atoi(common.GetQueryParam(r))
 
 	status := autoMapperForView(event)
 
