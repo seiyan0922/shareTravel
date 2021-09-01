@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"shareTravel/common"
 	"shareTravel/model"
@@ -66,8 +65,6 @@ func memberSaveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status := autoMapperForView(event, member)
-
-	fmt.Println(status)
 
 	RenderTemplate(w, MEMBER_COMPLETE_PATH, status)
 }

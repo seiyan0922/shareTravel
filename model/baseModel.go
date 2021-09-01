@@ -127,7 +127,6 @@ func findAll(table string, subject []string, conditions map[string]interface{}) 
 
 	query := setSelectQuery(table, subject, conditions)
 
-	fmt.Println(query)
 	rows, err := Db.Query(query)
 
 	return rows, err

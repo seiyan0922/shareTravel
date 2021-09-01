@@ -2,7 +2,7 @@
 {{ template "header"}}
 <div class="body">
     <div class="content">
-        {{template "sidebar"}}
+        {{template "sidebar" .}}
         <div class="new-event-page">
             <div class="new-event-title">Complete Create Member</div>
             <div class="gray-line"></div>

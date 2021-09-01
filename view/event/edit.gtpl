@@ -1,6 +1,6 @@
 {{ template "header"}}
 <div class="body">
-    {{template "sidebar"}}
+    {{template "sidebar" .}}
     <div class="event-content .clearfix">
         <div class="event-header">
             <div class="event-icon"></div>

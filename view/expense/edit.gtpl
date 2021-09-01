@@ -1,7 +1,7 @@
 {{ template "header"}}
 <div class="body">
     <div class="content">
-        {{template "sidebar"}}
+        {{template "sidebar" .}}
         <div class="new-event-page">
             <div class="new-event-title">Edit Expense</div>
             <div class="gray-line"></div>
