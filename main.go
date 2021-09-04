@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"shareTravel/controller"
+	"shareTravel/model"
 )
 
 func main() {
@@ -15,6 +16,10 @@ func main() {
 	os.Setenv("Host", "127.0.0.1")
 	os.Setenv("Port", "3306")
 	os.Setenv("DataBase", "share_travel")
+	//サーバー起動時にDBコネクションの起動
+	model.Connect()
+	//処理が完了した際コネクションをクローズする
+	defer model.Db.Close()
 
 	http.HandleFunc("/", controller.MakeHandler(controller.TopHandler))
 	http.HandleFunc("/event/", controller.MakeHandler(controller.EventHandler))

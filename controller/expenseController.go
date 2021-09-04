@@ -74,7 +74,12 @@ func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 
 	members := model.GetMembers(event.Id)
 
-	status := defalutPriceSet(members, expense, event)
+	default_price := defalutPriceSet(members, expense, event)
+
+	//値のセット
+	status := autoMapperForView(event, expense, members)
+	status["Price"] = &default_price
+	status["Temporarily"] = members[0].Id
 
 	RenderTemplate(w, EXPENSE_CONFIRM_PATH, status)
 }
@@ -96,7 +101,10 @@ func calculateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	//エラーがあった場合
 	if errs != nil {
 
-		status := defalutPriceSet(members, expense, event)
+		default_price := defalutPriceSet(members, expense, event)
+		status := autoMapperForView(event, expense, members)
+		status["Price"] = &default_price
+		status["Temporarily"] = members[0].Id
 		errorHandler(w, EXPENSE_ADD_PATH, status, errs)
 		return
 	}
@@ -105,6 +113,7 @@ func calculateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	total := expense.Total
 
 	for _, member := range members {
+
 		//入力値とデフォルトの負担金額が異なる場合（金額の変更があった場合）
 		if r.FormValue(strconv.Itoa(member.Id)) != r.FormValue("price") {
 			//入力値を配列に格納し、合計金額を減算
@@ -113,7 +122,10 @@ func calculateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 				errs := map[string]string{}
 				errs["Error"] = "金額は半角数字で入力して下さい"
 
-				status := defalutPriceSet(members, expense, event)
+				default_price := defalutPriceSet(members, expense, event)
+				status := autoMapperForView(event, expense, members)
+				status["Price"] = &default_price
+				status["Temporarily"] = members[0].Id
 
 				errorHandler(w, EXPENSE_CONFIRM_PATH, status, errs)
 				return
@@ -459,7 +471,7 @@ func formValueEncodeForExpense(r *http.Request) (*model.Expense, map[string]stri
 }
 
 //初期表示用の各参加者負担金額の計算
-func defalutPriceSet(members []*model.Member, expense *model.Expense, event *model.Event) map[string]interface{} {
+func defalutPriceSet(members []*model.Member, expense *model.Expense, event *model.Event) int {
 	//合計金額を人数で割った値を算出
 	member_count := len(members)
 	default_price := (expense.Total / member_count) / 100 * 100
@@ -473,12 +485,8 @@ func defalutPriceSet(members []*model.Member, expense *model.Expense, event *mod
 	default_pool := expense.Total - (default_price * len(members))
 	expense.Pool = default_pool
 
-	//値のセット
-	status := autoMapperForView(event, expense, members)
-	status["Price"] = &default_price
-	status["Temporarily"] = members[0].Id
+	return default_price
 
-	return status
 }
 
 //再計算時に金額を変更された参加者を抽出、変更後の差し引き合計金額を計算

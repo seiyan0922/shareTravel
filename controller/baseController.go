@@ -38,11 +38,6 @@ func MakeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
 
-		//サーバー起動時にDBコネクションの起動
-		model.Connect()
-		//処理が完了した際コネクションをクローズする
-		defer model.Db.Close()
-
 		if m != nil {
 			fn(w, r, m[2])
 		} else {

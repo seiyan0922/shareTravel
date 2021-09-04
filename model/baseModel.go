@@ -30,6 +30,13 @@ func Connect() {
 		panic(err)
 	}
 
+	//コネクションプールの最大接続数を設定。
+	Db.SetMaxIdleConns(100)
+	//接続の最大数を設定。 nに0以下の値を設定で、接続数は無制限。
+	Db.SetMaxOpenConns(100)
+	//接続の再利用が可能な時間を設定。dに0以下の値を設定で、ずっと再利用可能。
+	Db.SetConnMaxLifetime(100 * time.Second)
+
 }
 
 //重複チェック
