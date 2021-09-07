@@ -10,11 +10,11 @@
                 <table class="form-table">
                     <tr>
                         <td>名称</td>
-                        <td>：{{.Name}}</td>
+                        <td>：{{.Expense.Name}}</td>
                     </tr>
                     <tr>
                         <td>合計金額</td>
-                        <td>：{{.Total}}</td>
+                        <td>：{{.Expense.Total}}円</td>
                     </tr>
                 </table>
                 <div class="alert-authkey">
@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="back-common-box">
-                    <a href="/event/show?event_id={{.EventId}}" class="back-common">イベントTOPページへ→</a>
+                    <a href="/event/show?event_id={{.Expense.EventId}}" class="back-common">イベントTOPページへ→</a>
                 </div>
                
 

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"shareTravel/common"
 	"shareTravel/model"
@@ -79,6 +78,7 @@ func confirmExpenseHandler(w http.ResponseWriter, r *http.Request) {
 	//値のセット
 	status := autoMapperForView(event, expense, members)
 	status["Price"] = &default_price
+	status["Slash"] = "true"
 	status["Temporarily"] = members[0].Id
 
 	RenderTemplate(w, EXPENSE_CONFIRM_PATH, status)
@@ -109,56 +109,11 @@ func calculateExpenseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	changed := map[int]int{}
-	total := expense.Total
+	new_price, err := calculatePrices(expense, members, event, r, w)
 
-	for _, member := range members {
-
-		//入力値とデフォルトの負担金額が異なる場合（金額の変更があった場合）
-		if r.FormValue(strconv.Itoa(member.Id)) != r.FormValue("price") {
-			//入力値を配列に格納し、合計金額を減算
-			price, err := strconv.Atoi(r.FormValue(strconv.Itoa(member.Id)))
-			if err != nil {
-				errs := map[string]string{}
-				errs["Error"] = "金額は半角数字で入力して下さい"
-
-				default_price := defalutPriceSet(members, expense, event)
-				status := autoMapperForView(event, expense, members)
-				status["Price"] = &default_price
-				status["Temporarily"] = members[0].Id
-
-				errorHandler(w, EXPENSE_CONFIRM_PATH, status, errs)
-				return
-			}
-			changed[member.Id] = price
-			total = total - price
-		}
+	if err != nil {
+		return
 	}
-
-	//変更があった参加者を除いた参加者の負担額を再計算
-	new_price := getNewPrice(members, r, changed, total)
-
-	//参加者負担金の合計
-	var member_total int
-
-	//負担金配列を作成
-Loop:
-	for i := 0; i < len(members); i++ {
-		for member_id, change := range changed {
-			if member_id == members[i].Id {
-				members[i].Calculate = change
-				member_total += members[i].Calculate
-				continue Loop
-			}
-		}
-		members[i].Calculate = new_price
-		member_total += members[i].Calculate
-	}
-
-	//端数
-	pool := expense.Total - member_total
-
-	expense.Pool = pool
 
 	status := autoMapperForView(event, expense, members)
 	status["Price"] = new_price
@@ -252,8 +207,10 @@ func completeExpenseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	status := autoMapperForView(event, expense, members)
+
 	//テンプレートの読み込み
-	RenderTemplate(w, EXPENSE_COMPLETE_PATH, expense)
+	RenderTemplate(w, EXPENSE_COMPLETE_PATH, status)
 
 }
 
@@ -309,65 +266,7 @@ func editCalculateHandler(w http.ResponseWriter, r *http.Request) {
 	expense.TemporarilyMemberId, _ = strconv.Atoi(r.FormValue("temporarily"))
 	expense.Pool, _ = strconv.Atoi(r.FormValue("pool"))
 
-	//負担金額に変更があった参加者マップ及び、合計金額との差分を作成
-	changed := map[int]int{}
-	total := expense.Total
-
-	//変更されたメンバーを抽出
-	for _, member := range members {
-		if r.FormValue(strconv.Itoa(member.Id)) != r.FormValue("before"+strconv.Itoa(member.Id)) {
-			price, err := strconv.Atoi(r.FormValue(strconv.Itoa(member.Id)))
-
-			//エラー処理
-			if err != nil {
-				fmt.Println(err)
-
-				//参加者に紐づく会計情報の取得
-				for i := 0; i < len(members); i++ {
-					members[i].SearchMemberExpense(expense.Id)
-				}
-
-				status := autoMapperForView(event, expense, members)
-				status["BeforePool"], _ = strconv.Atoi(r.FormValue("beforePool"))
-
-				if r.FormValue("slash") == "true" {
-					status["Slash"] = "ture"
-				} else {
-					status["Slash"] = "false"
-				}
-
-				errs := map[string]string{}
-				errs["Error"] = "金額は半角数字で入力してください。"
-
-				errorHandler(w, EXPENSE_EDIT_PATH, status, errs)
-				return
-			}
-			changed[member.Id] = price
-			total = total - price
-		}
-	}
-
-	//負担金の変更があった参加者以外の負担金の再計算
-	new_price := getNewPrice(members, r, changed, total)
-
-	//参加者の負担金の合計金額を設定及び、参加者構造体ポインタに負担金情報を設定
-	member_total := 0
-Loop:
-	for i := 0; i < len(members); i++ {
-		for member_id, change := range changed {
-			if member_id == members[i].Id {
-				members[i].Calculate = change
-				member_total += members[i].Calculate
-				continue Loop
-			}
-		}
-		members[i].Calculate = new_price
-		member_total += members[i].Calculate
-	}
-
-	//端数を支払い情報に設定
-	pool := expense.Total - member_total
-	expense.Pool = pool
+	calculatePrices(expense, members, event, r, w)
 
 	//画面表示情報成形処理
 	status := autoMapperForView(event, expense, members)
@@ -468,6 +367,81 @@ func formValueEncodeForExpense(r *http.Request) (*model.Expense, map[string]stri
 	} else {
 		return expense, nil
 	}
+}
+
+//再計算共通処理
+func calculatePrices(expense *model.Expense, members []*model.Member, event *model.Event, r *http.Request, w http.ResponseWriter) (int, error) {
+	changed := map[int]int{}
+	total := expense.Total
+
+	for _, member := range members {
+
+		//入力値とデフォルトの負担金額が異なる場合（金額の変更があった場合）
+		if r.FormValue(strconv.Itoa(member.Id)) != r.FormValue("before"+strconv.Itoa(member.Id)) {
+			//入力値を配列に格納し、合計金額を減算
+			price, err := strconv.Atoi(r.FormValue(strconv.Itoa(member.Id)))
+			if err != nil {
+				errs := map[string]string{}
+				errs["Error"] = "金額は半角数字で入力して下さい"
+
+				status := autoMapperForView(event, expense, members)
+
+				if r.FormValue("edit") != "true" {
+
+					default_price := defalutPriceSet(members, expense, event)
+					status["Price"] = &default_price
+
+				} else {
+
+					for i := 0; i < len(members); i++ {
+						members[i].SearchMemberExpense(expense.Id)
+					}
+
+				}
+
+				status["Temporarily"] = members[0].Id
+				status["BeforePool"], _ = strconv.Atoi(r.FormValue("beforePool"))
+
+				if r.FormValue("slash") == "true" {
+					status["Slash"] = "ture"
+				} else {
+					status["Slash"] = "false"
+				}
+
+				errorHandler(w, EXPENSE_CONFIRM_PATH, status, errs)
+				return 0, err
+			}
+			changed[member.Id] = price
+			total = total - price
+		}
+	}
+
+	//変更があった参加者を除いた参加者の負担額を再計算
+	new_price := getNewPrice(members, r, changed, total)
+
+	//参加者負担金の合計
+	var member_total int
+
+	//負担金配列を作成
+Loop:
+	for i := 0; i < len(members); i++ {
+		for member_id, change := range changed {
+			if member_id == members[i].Id {
+				members[i].Calculate = change
+				member_total += members[i].Calculate
+				continue Loop
+			}
+		}
+		members[i].Calculate = new_price
+		member_total += members[i].Calculate
+	}
+
+	//端数
+	pool := expense.Total - member_total
+
+	expense.Pool = pool
+
+	return new_price, nil
 }
 
 //初期表示用の各参加者負担金額の計算

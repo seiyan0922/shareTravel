@@ -36,6 +36,7 @@
                             <tr>
                                 <td>{{$member.Name}}</td>
                                 <td>：<input type="text" name="{{$member.Id}}" value="{{.Calculate}}">円</td>
+                                <input type="hidden" name="before{{$member.Id}}" value="{{.Calculate}}">
                             </tr>
                             {{end}}
                         </table>
@@ -43,11 +44,12 @@
                             <input type="checkbox" name="slash" value="true" checked="checked">
                             <label for="slash">100円以下切捨て</label>
                         </div>
-                        <input type="hidden" name="name" value="{{.Expense.Name}}">
+                        <input type="hidden" name="event" value="{{.Event.Id}}">
                         <input type="hidden" name="total" value="{{.Expense.Total}}">
                         <input type="hidden" name="pool" value="{{.Expense.Pool}}">
+                        <input type="hidden" name="beforepool" value="{{.BeforePool}}">
+                        <input type="hidden" name="name" value="{{.Expense.Name}}">
                         <input type="hidden" name="remarks" value="{{.Expense.Remarks}}">
-                        <input type="hidden" name="price" value="{{.Price}}">
                         <div class="saikeisan">
                             <button type="submit" formaction="/expense/calculate?event_id={{.Event.Id}}">再計算</button>
                         </div>
